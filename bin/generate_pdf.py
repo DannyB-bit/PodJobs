@@ -147,11 +147,14 @@ def parse_markdown_to_flowables(filepath, styles):
         # Custom DNA ASCII art handling
         if stripped == "🧬 H U M A N 🧬":
             ascii_art = (
-                "AA&nbsp;&nbsp;&nbsp;&nbsp;AA&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;GG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CCCC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;TT<br/>"
-                "AA&nbsp;&nbsp;&nbsp;&nbsp;AA&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;GGG&nbsp;&nbsp;&nbsp;&nbsp;GGG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CC&nbsp;&nbsp;CC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TTT&nbsp;&nbsp;&nbsp;TT<br/>"
-                "AAAAAAAA&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;GG&nbsp;G&nbsp;&nbsp;G&nbsp;GG&nbsp;&nbsp;&nbsp;&nbsp;CCCCCCCC&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;T&nbsp;&nbsp;TT<br/>"
-                "AA&nbsp;&nbsp;&nbsp;&nbsp;AA&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;GG&nbsp;&nbsp;GG&nbsp;&nbsp;GG&nbsp;&nbsp;&nbsp;&nbsp;CC&nbsp;&nbsp;&nbsp;&nbsp;CC&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;T&nbsp;TT<br/>"
-                "AA&nbsp;&nbsp;&nbsp;&nbsp;AA&nbsp;&nbsp;&nbsp;&nbsp;TTTTTTTT&nbsp;&nbsp;&nbsp;&nbsp;GG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GG&nbsp;&nbsp;&nbsp;&nbsp;CC&nbsp;&nbsp;&nbsp;&nbsp;CC&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;TTT"
+                "AAAA&nbsp;&nbsp;&nbsp;&nbsp;AAAA&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;GGGG&nbsp;&nbsp;&nbsp;&nbsp;GGGG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CCCC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;TTTT<br/>"
+                "AAAA&nbsp;&nbsp;&nbsp;&nbsp;AAAA&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;GGGGG&nbsp;&nbsp;GGGGG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CCCCCC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TTTTT&nbsp;&nbsp;&nbsp;TTTT<br/>"
+                "AAAA&nbsp;&nbsp;&nbsp;&nbsp;AAAA&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;GGGGGGGGGGGG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CCCCCCCC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TTTTTT&nbsp;&nbsp;TTTT<br/>"
+                "AAAAAAAAAAAA&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;GGGGGGGGGGGG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CCCC&nbsp;&nbsp;CCCC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;T&nbsp;&nbsp;TTTT<br/>"
+                "AAAAAAAAAAAA&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;GGGG&nbsp;GG&nbsp;GGGG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CCCCCCCCCC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;T&nbsp;TTTT<br/>"
+                "AAAA&nbsp;&nbsp;&nbsp;&nbsp;AAAA&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;GGGG&nbsp;&nbsp;&nbsp;&nbsp;GGGG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CCCCCCCCCC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;TTTTT<br/>"
+                "AAAA&nbsp;&nbsp;&nbsp;&nbsp;AAAA&nbsp;&nbsp;&nbsp;&nbsp;TTTTTTTTTTTT&nbsp;&nbsp;&nbsp;&nbsp;GGGG&nbsp;&nbsp;&nbsp;&nbsp;GGGG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CCCC&nbsp;&nbsp;CCCC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;TTTT<br/>"
+                "AAAA&nbsp;&nbsp;&nbsp;&nbsp;AAAA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TTTTTTTTTT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GGGG&nbsp;&nbsp;&nbsp;&nbsp;GGGG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CCCC&nbsp;&nbsp;CCCC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TTTT&nbsp;&nbsp;&nbsp;&nbsp;TTTT"
             )
             flowables.append(Spacer(1, 10))
             flowables.append(Paragraph(ascii_art, styles['HumanDnaStyle']))
@@ -385,8 +388,8 @@ def main():
     styles.add(ParagraphStyle(
         name='HumanDnaStyle',
         fontName='Courier-Bold',
-        fontSize=8,
-        leading=10,
+        fontSize=6.5,
+        leading=8.5,
         textColor=colors.HexColor('#0F172A'),
         alignment=TA_CENTER,
         spaceBefore=15,
