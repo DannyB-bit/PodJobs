@@ -26,8 +26,18 @@ class NumberedCanvas(canvas.Canvas):
         super().save()
 
     def draw_page_number(self, page_count):
-        # Do not draw header/footer on cover page (page 1)
         if self._pageNumber == 1:
+            self.saveState()
+            if os.path.exists("assets/pj_logo.jpg"):
+                self.drawImage("assets/pj_logo.jpg", 0, 0, width=612, height=792)
+            self.restoreState()
+            return
+        
+        if self._pageNumber == page_count:
+            self.saveState()
+            if os.path.exists("assets/theaicollective_glow.jpg"):
+                self.drawImage("assets/theaicollective_glow.jpg", 0, 0, width=612, height=792)
+            self.restoreState()
             return
         
         self.saveState()
@@ -290,60 +300,19 @@ def main():
         textColor=colors.HexColor('#334155')
     ))
 
-    # COVER PAGE CONSTRUCTION
+    # STORY ASSEMBLY
     story = []
     
-    # 1. Spacer
-    story.append(Spacer(1, 20))
-    
-    # 2. Cover image (PJ Logo)
-    if os.path.exists("assets/pj_logo.jpg"):
-        logo = Image("assets/pj_logo.jpg", width=220, height=220)
-        logo.hAlign = 'CENTER'
-        story.append(logo)
-    
-    story.append(Spacer(1, 30))
-    
-    # 3. Titles
-    title_text = "<b>PROJECT PJ: A COGNITIVE AMPLIFIER FOR PROFESSIONAL SWARMS</b>"
-    story.append(Paragraph(title_text, styles['WhitepaperTitle']))
-    
-    subtitle_style = ParagraphStyle(
-        name='CoverSubtitle',
-        fontName='Helvetica',
-        fontSize=12,
-        leading=16,
-        textColor=colors.HexColor('#475569'),
-        alignment=TA_CENTER
-    )
-    story.append(Paragraph("Integrating Multi-Agent Cascades, Model Context Protocol, and Cryptographic Consensus", subtitle_style))
-    story.append(Spacer(1, 40))
-    
-    meta_style = ParagraphStyle(
-        name='CoverMeta',
-        fontName='Helvetica-Bold',
-        fontSize=9.5,
-        leading=14,
-        textColor=colors.HexColor('#64748B'),
-        alignment=TA_CENTER
-    )
-    story.append(Paragraph("Kaggle 5-Day Intensive: AI Agents Capstone Project (June 15 - 19, 2026)", meta_style))
-    story.append(Spacer(1, 4))
-    story.append(Paragraph("<b>Architect & Author:</b> Devs One — Danny Bouldiez", meta_style))
-    story.append(Paragraph("<b>Platform:</b> Google AI Studio, Google Antigravity & Nous Research Hermes Agent", meta_style))
-    
+    # Page 1: Front Cover full-page PJ Logo image (handled in NumberedCanvas)
     story.append(PageBreak())
     
-    # Parse remaining whitepaper sections from Whitepaper.md
+    # Pages 2 to N-1: Parse and add all whitepaper sections from Whitepaper.md
     whitepaper_flowables = parse_markdown_to_flowables("Whitepaper.md", styles)
+    story.extend(whitepaper_flowables)
     
-    # Filter out elements already displayed on the cover page (such as title, subtitle, metadata, logo)
-    started = False
-    for flowable in whitepaper_flowables:
-        if isinstance(flowable, Paragraph) and "Executive Summary" in flowable.text:
-            started = True
-        if started:
-            story.append(flowable)
+    # Page N: Back Cover full-page AI Collective Glow image (handled in NumberedCanvas)
+    story.append(PageBreak())
+    story.append(Spacer(1, 1))
             
     # Build Document using NumberedCanvas for header/footer page numbers
     doc.build(story, canvasmaker=NumberedCanvas)
