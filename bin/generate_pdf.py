@@ -196,9 +196,9 @@ def parse_markdown_to_flowables(filepath, styles):
             if os.path.exists(img_path):
                 # Check for logo and assign proportional dimensions to avoid distortion
                 if "google_logo" in img_path:
-                    img = Image(img_path, width=145, height=50)
+                    img = Image(img_path, width=261, height=90)
                 elif "kaggle_logo" in img_path:
-                    img = Image(img_path, width=130, height=50)
+                    img = Image(img_path, width=234, height=90)
                 elif "pj_logo" in img_path:
                     img = Image(img_path, width=180, height=180)
                 else:
