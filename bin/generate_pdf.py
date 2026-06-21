@@ -219,7 +219,7 @@ def parse_markdown_to_flowables(filepath, styles):
                 if "google_logo" in img_path:
                     img = Image(img_path, width=319, height=110)
                     img.hAlign = 'CENTER'
-                    flowables.append(Spacer(1, 100))  # push down Google logo
+                    flowables.append(Spacer(1, 25))  # push down Google logo slightly to group with disclaimers
                     flowables.append(img)
                     flowables.append(Spacer(1, 15))
                 elif "kaggle_logo" in img_path:
@@ -281,6 +281,8 @@ def parse_markdown_to_flowables(filepath, styles):
             # Blockquote
             text = format_inline(stripped[2:])
             if "Special thanks" in text or "educational and entertainment" in text:
+                if "Special thanks" in text:
+                    flowables.append(Spacer(1, 60)) # push the entire Page 9 layout group down
                 flowables.append(Paragraph(text, styles['DisclaimerStyle']))
             else:
                 flowables.append(Paragraph(text, styles['BlockquoteCustom']))
@@ -432,9 +434,9 @@ def main():
     styles.add(ParagraphStyle(
         name='DisclaimerStyle',
         fontName='Helvetica-Oblique',
-        fontSize=8.0,
-        leading=11,
-        textColor=colors.HexColor('#475569'),
+        fontSize=9.5,
+        leading=13.5,
+        textColor=colors.HexColor('#334155'),
         alignment=TA_CENTER,
         leftIndent=36,
         rightMargin=36,
