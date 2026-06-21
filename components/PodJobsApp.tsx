@@ -36,6 +36,7 @@ import {
   RotateCcw,
   Sparkles,
   ChevronRight,
+  ChevronLeft,
   Info,
   Maximize2,
   Minimize2,
@@ -3865,6 +3866,16 @@ if __name__ == "__main__":
               transition={{ duration: 0.3 }}
               className="bg-[#0B0F19] border border-slate-800/80 rounded-3xl max-w-lg w-full p-6 md:p-8 mt-4 mb-4 shadow-2xl relative space-y-5 text-left"
             >
+              {/* Go back to page button (Arrow <) */}
+              <button
+                type="button"
+                onClick={() => setIsOnboardingOpen(false)}
+                className="absolute top-4 left-4 text-cyan-400/80 hover:text-cyan-400 hover:scale-105 transition-all cursor-pointer w-9 h-9 rounded-full bg-slate-950 border border-cyan-500/30 hover:border-cyan-500/60 flex items-center justify-center p-0 shadow-lg shadow-cyan-500/5"
+                title="Go Back to Dashboard"
+              >
+                <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
+              </button>
+
               {/* Reset/Cancel button if already onboarded */}
               {isOnboarded && (
                 <button
@@ -4129,6 +4140,20 @@ if __name__ == "__main__":
                     <p className="font-bold text-slate-100 uppercase tracking-widest text-[9px] font-mono text-cyan-400">4. Third-Party Integrations Policy</p>
                     <p>
                       The app integrates the @google/genai SDK on the server side to power natural language agent responses. By using this, you are bound by Google&apos;s Gemini Developer Terms and region limits.
+                    </p>
+
+                    <p className="font-bold text-slate-100 uppercase tracking-widest text-[9px] font-mono text-cyan-400">5. Nous Research Hermes Agent Integration &amp; Disclaimers</p>
+                    <p>
+                      This project integrates and utilizes the open-source <b>Nous Research Hermes Agent</b> framework. 
+                      We explicitly declare that this project and its developers are <b>not associated with, affiliated with, sponsored by, or endorsed by</b> Nous Research or the official Hermes Agent project team. 
+                      The Hermes Agent framework is fully open-source software, and you can view their project details and their license link directly at the official portal: <a href="https://hermes-agent.nousresearch.com/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">https://hermes-agent.nousresearch.com/</a>.
+                    </p>
+
+                    <p className="font-bold text-slate-100 uppercase tracking-widest text-[9px] font-mono text-cyan-400">6. Complete Ironclad Liability Shield &amp; Contest Scope</p>
+                    <p>
+                      The sole purpose of this project and software is as a sandbox submission for the <a href="https://www.kaggle.com/competitions/5-day-ai-agents-intensive-vibecoding-course-with-google/overview" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">5-Day AI Agents: Intensive Vibe Coding Course With Google</a> hosted by Google.
+                      <br />
+                      Under no circumstances shall the author (<b>Danny Bouldiez</b>, also known by the pseudonym <b>Devs One</b>) or the organization/domain <b>TheAiCollective.art</b> (including any associated partners, developers, or affiliates) be liable for any direct, indirect, incidental, special, exemplary, or consequential damages, or any liability whatsoever (including, but not limited to, procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage. This liability shield is intended to be complete, absolute, and ironclad.
                     </p>
                   </>
                 ) : (
