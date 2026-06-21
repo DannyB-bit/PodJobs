@@ -344,11 +344,11 @@ def main():
     styles.add(ParagraphStyle(
         name='WeAreStyle',
         fontName='Helvetica-Bold',
-        fontSize=36,
-        leading=42,
+        fontSize=22,
+        leading=26,
         textColor=colors.HexColor('#0F172A'),
         alignment=TA_CENTER,
-        spaceBefore=15,
+        spaceBefore=20,
         spaceAfter=15
     ))
 
