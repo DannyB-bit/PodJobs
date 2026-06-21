@@ -23,7 +23,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html 
       lang="en" 
-      className={`${inter.variable} ${jetbrainsMono.variable} dark scroll-smooth`}
+      className={`${inter.variable} ${jetbrainsMono.variable} dark`}
       style={{ colorScheme: 'dark' }}
     >
       <body 

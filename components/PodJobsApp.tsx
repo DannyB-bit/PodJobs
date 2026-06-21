@@ -1691,10 +1691,10 @@ if __name__ == "__main__":
     <main className={`min-h-screen ${isLightTheme ? "theme-light text-[#0F172A] bg-[#F1F5F9]" : "bg-[#06080D] text-[#E2E8F0]"} font-sans selection:bg-blue-500/30 overflow-x-hidden relative`} id="app_root">
       
       {/* GOOGLE LOGO COLOR GLOWS - REVOLVING & PULSING ACCENTS */}
-      <div className="absolute top-0 left-1/4 w-[550px] h-[550px] bg-[#4285F4]/8 rounded-full blur-[130px] pointer-events-none animate-pulse-glow" />
-      <div className="absolute top-1/4 right-5 w-[650px] h-[650px] bg-[#EA4335]/7 rounded-full blur-[150px] pointer-events-none animate-pulse-glow-alt" />
-      <div className="absolute bottom-1/4 left-5 w-[500px] h-[500px] bg-[#FBBC05]/5 rounded-full blur-[140px] pointer-events-none animate-pulse-glow" />
-      <div className="absolute bottom-0 right-1/4 w-[550px] h-[550px] bg-[#34A853]/6 rounded-full blur-[130px] pointer-events-none animate-pulse-glow-alt" />
+      <div className="absolute top-0 left-1/4 w-[550px] h-[550px] bg-[#4285F4]/8 rounded-full blur-[130px] pointer-events-none animate-pulse-glow" style={{ willChange: "transform, opacity" }} />
+      <div className="absolute top-1/4 right-5 w-[650px] h-[650px] bg-[#EA4335]/7 rounded-full blur-[150px] pointer-events-none animate-pulse-glow-alt" style={{ willChange: "transform, opacity" }} />
+      <div className="absolute bottom-1/4 left-5 w-[500px] h-[500px] bg-[#FBBC05]/5 rounded-full blur-[140px] pointer-events-none animate-pulse-glow" style={{ willChange: "transform, opacity" }} />
+      <div className="absolute bottom-0 right-1/4 w-[550px] h-[550px] bg-[#34A853]/6 rounded-full blur-[130px] pointer-events-none animate-pulse-glow-alt" style={{ willChange: "transform, opacity" }} />
 
       {/* SUPERIOR TEAM / BRAND HEADER */}
       <header className="border-b border-white/5 bg-[#090C12]/80 backdrop-blur-xl sticky top-0 z-50 px-4 md:px-8 py-3.5 shadow-md shadow-black/40 animate-fade-in" id="main_header">
@@ -1724,7 +1724,7 @@ if __name__ == "__main__":
                   <span className="text-[#FBBC05]">s</span>
                   <span className="text-slate-300 font-normal">.ai</span>
                 </h1>
-                <span className="text-[8px] tracking-widest font-mono text-[#EA4335] uppercase bg-[#EA4335]/15 border border-[#EA4335]/30 px-1.5 py-0.5 rounded shrink-0 font-bold ml-2 relative top-[1px]">PRONOUNS: PJS</span>
+                <span className="text-[8px] tracking-widest font-mono text-[#EA4335] uppercase bg-[#EA4335]/15 border border-[#EA4335]/30 px-1.5 py-0.5 rounded shrink-0 font-bold ml-2 relative top-[1px]">PRONOUNS: PJ</span>
               </div>
               <p className="text-[9px] text-[#A0AEC0] font-mono tracking-wider uppercase">AstronautSHE.com Team Orchestration</p>
             </div>
@@ -1797,10 +1797,10 @@ if __name__ == "__main__":
             <div className="flex items-center gap-2 mt-1 justify-end">
               <button
                 onClick={() => setIsOnboardingOpen(true)}
-                className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-950/40 border border-emerald-500/30 hover:border-emerald-400/60 transition-all text-[8px] tracking-wider uppercase font-mono text-emerald-400 cursor-pointer"
+                className="flex items-center gap-1.5 px-1.5 py-0.5 rounded-full bg-cyan-950/40 border border-cyan-500/30 hover:border-cyan-400/60 transition-all text-[6.5px] tracking-wider uppercase font-mono text-cyan-400 cursor-pointer shadow-[0_0_8px_rgba(6,182,212,0.25)] select-none"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                Hermes: {isOnboarded && onboardingData.userName ? onboardingData.userName : "Sync Profile"}
+                <span className="w-1 h-1 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_6px_#00E5FF]" />
+                Powered by HERMES AGENT V0.17.0 BY NOUS RESEARCH
               </button>
             </div>
           </div>
