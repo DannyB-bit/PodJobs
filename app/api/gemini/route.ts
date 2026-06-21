@@ -364,9 +364,8 @@ ${security || "Isolation: Signed Merkle verification proofs, zero secret leaks, 
 
 Please reply directly to the human Director's query. Adopt your exact professional role, character, pronouns, and design focus. Provide a highly specialized, realistic, structured response demonstrating actual knowledge from these documents. Keep it crisp, technical, or editorial as appropriate (match your specialty).`;
 
-      if (!isKeyConfigured) {
-        const fallbackReplies = [
-          `[DEVELOPER MODE: DIRECT OFFLINE COGNITIVE BRIDGE ACQUIRED]
+      const fallbackReplies = [
+        `[DEVELOPER MODE: DIRECT OFFLINE COGNITIVE BRIDGE ACQUIRED]
 This is ${agentName} speaking, representing my assigned nodes (${pronouns}). My custom routing gateway at 'router://openclaw/node' is active and listening.
 LMCache memory layers and MemVid video sync records have loaded securely.
 
@@ -377,42 +376,57 @@ NVIDIA NeMo Guardrails check complete:
 
 Response envelope:
 "Human Director, I have received your request. Using my specialized capability in ${specialty || "Operations Analysis"}, I am coordinating with neighboring peer swarm branches to register this constraint. Proceeding with soul.md specifications."`,
-          `[DIRECT GATEWAY TUNNEL OPENED]
+        `[DIRECT GATEWAY TUNNEL OPENED]
 Node: ${agentName} (${pronouns}) reporting in. Standard system state validated against security.md limits.
 Episodic cache hits: 100%.
 
 Analysis:
 "I've updated my internal episodic index buffers with your latest instructions. I am fully ready to act as a consensus stakeholder for our next workflow iteration under NeMo/OpenClaw guidelines."`
-        ];
+      ];
+
+      if (!isKeyConfigured) {
         const randomReply = fallbackReplies[Math.floor(Math.random() * fallbackReplies.length)];
         return NextResponse.json({ reply: randomReply });
       }
 
-      const ai = new GoogleGenAI({
-        apiKey: apiKey,
-        httpOptions: {
-          headers: {
-            'User-Agent': 'aistudio-build',
+      try {
+        const ai = new GoogleGenAI({
+          apiKey: apiKey,
+          httpOptions: {
+            headers: {
+              'User-Agent': 'aistudio-build',
+            }
           }
-        }
-      });
+        });
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: userMessage,
-        config: {
-          systemInstruction: systemPrompt,
-        }
-      });
+        const response = await ai.models.generateContent({
+          model: "gemini-3.5-flash",
+          contents: userMessage,
+          config: {
+            systemInstruction: systemPrompt,
+          }
+        });
 
-      return NextResponse.json({ reply: response.text });
+        return NextResponse.json({ reply: response.text });
+      } catch (error: any) {
+        console.warn("Direct agent chat failed, using fallback simulation engine:", error.message || error);
+        const randomReply = fallbackReplies[Math.floor(Math.random() * fallbackReplies.length)];
+        const decoratedReply = `[FALLBACK SIMULATION ENGINE - LIVE API RATE LIMIT ENCOUNTERED]\n\n${randomReply}`;
+        return NextResponse.json({ reply: decoratedReply });
+      }
     }
 
     if (!isKeyConfigured) {
       if (action === "generate-pod") {
         return NextResponse.json(generateFallbackPod(role, sector, onboardingUser));
       } else {
-        return NextResponse.json(generateFallbackSimulation(prompt, role, agents || [], retrievedChunks || []));
+        const mockData = generateFallbackSimulation(prompt, role, agents || [], retrievedChunks || []);
+        const merkleRoot = calculateMerkleRoot(mockData.executionLogs);
+        return NextResponse.json({
+          ...mockData,
+          merkleRoot,
+          engine: "Mock Fallback Engine"
+        });
       }
     }
 

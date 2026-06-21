@@ -15,7 +15,9 @@ const colors = {
   red: "\x1b[31m"
 };
 
-const LIVE_HOST = "https://podjobs.vercel.app";
+const args = process.argv.slice(2);
+const isLocal = args.includes("--local") || args.includes("-l");
+const LIVE_HOST = isLocal ? "http://localhost:3000" : "https://podjobs.vercel.app";
 
 console.log(`${colors.bright}${colors.cyan}--- PodJobs Live Production Validator ---${colors.reset}\n`);
 console.log(`Target Deployed Host: ${colors.yellow}${LIVE_HOST}${colors.reset}\n`);
