@@ -1,0 +1,290 @@
+@import "tailwindcss";
+
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes slow-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes slow-spin-reverse {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.25; transform: scale(1) translate(0, 0); }
+  50% { opacity: 0.55; transform: scale(1.15) translate(4%, -3%); }
+}
+
+@keyframes pulse-glow-alt {
+  0%, 100% { opacity: 0.2; transform: scale(1) translate(0, 0); }
+  50% { opacity: 0.5; transform: scale(1.2) translate(-5%, 4%); }
+}
+
+@keyframes rainbow-glow {
+  0%, 100% { border-color: rgba(66, 133, 244, 0.4); box-shadow: 0 0 15px rgba(66, 133, 244, 0.15); }
+  25% { border-color: rgba(234, 67, 53, 0.4); box-shadow: 0 0 15px rgba(234, 67, 53, 0.15); }
+  50% { border-color: rgba(251, 188, 5, 0.4); box-shadow: 0 0 15px rgba(251, 188, 5, 0.15); }
+  75% { border-color: rgba(52, 168, 83, 0.4); box-shadow: 0 0 15px rgba(52, 168, 83, 0.15); }
+}
+
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+
+.animate-gradient-flow {
+  animation: gradient-flow 12s linear infinite;
+}
+
+.animate-slow-spin {
+  animation: slow-spin 35s linear infinite;
+}
+
+.animate-slow-spin-reverse {
+  animation: slow-spin-reverse 45s linear infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 12s ease-in-out infinite;
+}
+
+.animate-pulse-glow-alt {
+  animation: pulse-glow-alt 16s ease-in-out infinite;
+}
+
+.animate-rainbow-glow {
+  animation: rainbow-glow 6s linear infinite;
+}
+
+.animate-float-gentle {
+  animation: float-gentle 6s ease-in-out infinite;
+}
+
+@keyframes agent-active-glow {
+  0%, 100% {
+    box-shadow: 0 0 8px var(--glow-color, rgba(34, 211, 238, 0.25)), inset 0 0 4px var(--glow-color, rgba(34, 211, 238, 0.1));
+    border-color: var(--border-glow-color, rgba(34, 211, 238, 0.35));
+  }
+  50% {
+    box-shadow: 0 0 20px var(--glow-color, rgba(34, 211, 238, 0.7)), inset 0 0 10px var(--glow-color, rgba(34, 211, 238, 0.3));
+    border-color: var(--border-glow-high-color, rgba(34, 211, 238, 0.75));
+  }
+}
+
+.animate-agent-glow {
+  animation: agent-active-glow 2s ease-in-out infinite;
+}
+
+/* Custom modern scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.4);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(66, 133, 244, 0.3);
+  border-radius: 999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(66, 133, 244, 0.6);
+}
+
+/* ========================================================
+   INTERACTIVE LIGHT THEME OVERRIDES (ASTRO_SHE INTEGRATION)
+   ======================================================== */
+.theme-light {
+  --background-fallback: #F8FAFC;
+  --foreground-fallback: #0F172A;
+  background-color: #F8FAFC !important;
+  color: #0F172A !important;
+  color-scheme: light;
+}
+
+/* Background resets for dark layouts */
+.theme-light,
+.theme-light .bg-\[\#06080D\],
+.theme-light .bg-\[\#040508\],
+.theme-light .bg-\[\#04060A\],
+.theme-light .bg-\[\#030509\],
+.theme-light .bg-\[\#050709\],
+.theme-light .bg-\[\#05070A\],
+.theme-light .bg-\[\#050608\],
+.theme-light .bg-\[\#070A0F\],
+.theme-light .bg-slate-950,
+.theme-light .bg-slate-900\/50[class*="backdrop-blur"] {
+  background-color: #F1F5F9 !important; /* Elegant light slate bg */
+}
+
+/* Main Cards to vibrant solid white card blocks */
+.theme-light .bg-\[\#090C12\],
+.theme-light .bg-\[\#0A0C10\],
+.theme-light .bg-\[\#0B0F19\],
+.theme-light .bg-\[\#0E1219\],
+.theme-light .bg-\[\#0F1218\],
+.theme-light .bg-\[\#0A0D14\],
+.theme-light .bg-\[\#0e121b\],
+.theme-light .bg-slate-900,
+.theme-light .bg-[#0F1218],
+.theme-light .bg-slate-900\/50,
+.theme-light .bg-\[\#0E1219\]\/75,
+.theme-light .bg-\[\#0E1219\]\/80,
+.theme-light .bg-\[\#090C12\]\/80,
+.theme-light .bg-\[\#090C12\]\/50,
+.theme-light .bg-\[\#090C12\]\/70,
+.theme-light .bg-\[\#090C12\]\/90,
+.theme-light .bg-\[\#0A0C10\]\/50 {
+  background-color: #FFFFFF !important;
+}
+
+/* Specific component containers */
+.theme-light header,
+.theme-light nav {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(16px);
+  border-color: rgba(148, 163, 184, 0.15) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Dialogue screens & Modals */
+.theme-light .bg-\[\#04060A\]\/95,
+.theme-light .bg-\[\#030509\]\/90 {
+  background-color: rgba(15, 23, 42, 0.6) !important; /* Keep nice dark overlay for dialogue backdrop */
+  backdrop-filter: blur(8px) !important;
+}
+
+/* Text style mapping for high-contrast accessibility */
+.theme-light .text-white,
+.theme-light .text-slate-100,
+.theme-light .text-slate-200,
+.theme-light .text-\[\#E2E8F0\],
+.theme-light h1,
+.theme-light h2,
+.theme-light h3,
+.theme-light h4 {
+  color: #0F172A !important;
+}
+
+.theme-light .text-slate-300,
+.theme-light .text-slate-350,
+.theme-light .text-slate-250 {
+  color: #1E293B !important;
+}
+
+.theme-light .text-slate-400,
+.theme-light .text-slate-450 {
+  color: #475569 !important;
+}
+
+.theme-light .text-slate-500 {
+  color: #64748B !important;
+}
+
+.theme-light .text-slate-600 {
+  color: #55647A !important;
+}
+
+/* Hover/active state fixes */
+.theme-light .hover\:text-white:hover,
+.theme-light .hover\:text-slate-100:hover,
+.theme-light .group-hover\:text-white:hover,
+.theme-light .group:hover .group-hover\:text-white {
+  color: #0F172A !important;
+}
+
+/* Border overrides */
+.theme-light .border-slate-800,
+.theme-light .border-slate-850,
+.theme-light .border-slate-800\/80,
+.theme-light .border-slate-805,
+.theme-light .border-white\/5,
+.theme-light .border-white\/10 {
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+.theme-light .border-slate-700\/50,
+.theme-light .border-white\/10 {
+  border-color: rgba(148, 163, 184, 0.3) !important;
+}
+
+/* Specific container / elements backgrounds */
+.theme-light .bg-[#0A0C10],
+.theme-light .bg-[#05070a],
+.theme-light .bg-slate-900 {
+  background-color: #F8FAFC !important;
+  color: #0F172A !important;
+}
+
+.theme-light .bg-slate-900:hover,
+.theme-light .bg-slate-950:hover {
+  background-color: #F1F5F9 !important;
+}
+
+/* Interactive elements */
+.theme-light textarea,
+.theme-light input[type="text"],
+.theme-light select,
+.theme-light select option {
+  background-color: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  color: #04060A !important;
+}
+
+.theme-light textarea::placeholder,
+.theme-light input::placeholder {
+  color: #94A3B8 !important;
+}
+
+/* Terminal & Pre-formatted views */
+.theme-light pre,
+.theme-light .pre-element,
+.theme-light .bg-\[\#050608\] {
+  background-color: #F8FAFC !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+  color: #0F172A !important;
+}
+
+/* Accessibility updates for contrast */
+.theme-light .text-cyan-400,
+.theme-light .text-cyan-500,
+.theme-light .text-teal-400 {
+  color: #0369A1 !important; /* Sky 700 - Highly accessible blue/teal contrast link */
+}
+
+/* Profile syncing state */
+.theme-light .bg-emerald-950\/40 {
+  background-color: #E6F4EA !important;
+  color: #137333 !important;
+  border-color: rgba(19, 115, 51, 0.2) !important;
+}
+.theme-light .text-emerald-400 {
+  color: #137333 !important;
+}
+
+/* Urgent metrics alert */
+.theme-light .bg-[#EA4335]/15 {
+  background-color: #FCE8E6 !important;
+  color: #C5221F !important;
+  border-color: rgba(197, 34, 31, 0.2) !important;
+}
+
+/* Shadow elevation structures */
+.theme-light .bg-\[\#090C12\],
+.theme-light .bg-\[\#0A0C10\],
+.theme-light .bg-\[\#0B0F19\],
+.theme-light .bg-\[\#0E1219\],
+.theme-light [id^="agent_card_"] {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -4px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(148, 163, 184, 0.1) !important;
+}
+
+/* Active agent visual glows */
+.theme-light .animate-agent-glow {
+  box-shadow: 0 0 16px var(--glow-color, rgba(66, 133, 244, 0.18)), inset 0 0 8px var(--glow-color, rgba(66, 133, 244, 0.08)) !important;
+}
+

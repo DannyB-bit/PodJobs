@@ -1,0 +1,6 @@
+{
+  "name": "PodJobs.ai",
+  "description": "An interactive storytelling, simulator, and discovery environment for the future of specialized, 12-agent AI Pods and human orchestration",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
