@@ -256,7 +256,11 @@ def parse_markdown_to_flowables(filepath, styles):
             flowables.append(Spacer(1, 15))
         elif stripped.startswith('## '):
             text = format_inline(stripped[3:])
-            flowables.append(Paragraph(text, styles['Heading1Custom']))
+            if "Attestation" in text:
+                flowables.append(Spacer(1, 150))  # push it to the middle of page 8
+                flowables.append(Paragraph(text, styles['AttestationHeaderStyle']))
+            else:
+                flowables.append(Paragraph(text, styles['Heading1Custom']))
             flowables.append(Spacer(1, 8))
         elif stripped.startswith('### '):
             text = format_inline(stripped[4:])
@@ -409,6 +413,16 @@ def main():
         textColor=colors.HexColor('#0F172A'),
         alignment=TA_CENTER,
         spaceBefore=10,
+        spaceAfter=15
+    ))
+
+    styles.add(ParagraphStyle(
+        name='AttestationHeaderStyle',
+        fontName='Helvetica-Bold',
+        fontSize=15,
+        leading=18,
+        textColor=colors.HexColor('#1E293B'),
+        alignment=TA_CENTER,
         spaceAfter=15
     ))
 
