@@ -80,31 +80,13 @@ class NumberedCanvas(canvas.Canvas):
             self.setFillColor(colors.HexColor("#000000"))
             self.rect(0, 0, 612, 792, fill=True, stroke=False)
             
-            img_w = 400
-            img_h = 400
+            img_w = 500
+            img_h = 500
             img_x = 306 - (img_w / 2)
-            img_y = 260
+            img_y = 146
             if os.path.exists("assets/theaicollective_glow.jpg"):
                 # Center square image vertically
                 self.drawImage("assets/theaicollective_glow.jpg", img_x, img_y, width=img_w, height=img_h)
-                
-            # Draw white logo signature text below logo
-            self.setFillColor(colors.white)
-            self.setFont("Helvetica-Bold", 10)
-            self.drawCentredString(306, 210, "THEAICOLLECTIVE.ART")
-            
-            # Draw educational disclaimer below logo
-            self.setFillColor(colors.HexColor("#94A3B8")) # slate-400
-            self.setFont("Helvetica", 9)
-            self.drawCentredString(306, 175, "This whitepaper and project was intended for educational and entertainment purposes.")
-            
-            # Draw Kaggle and Google thank you note
-            self.setFillColor(colors.HexColor("#64748B")) # slate-500
-            self.setFont("Helvetica-Oblique", 8.5)
-            self.drawCentredString(306, 145, "Special thanks to Kaggle and Google for hosting the")
-            self.setFont("Helvetica-BoldOblique", 9)
-            self.drawCentredString(306, 130, "Kaggle 5-Day Intensive AI Agents Vibe Coding Course (2026)")
-            
             self.restoreState()
             return
         
@@ -142,6 +124,11 @@ def parse_markdown_to_flowables(filepath, styles):
     
     for line in lines:
         stripped = line.strip()
+        
+        # Custom pagebreak handling
+        if stripped == '<pagebreak/>' or stripped == '---pagebreak---':
+            flowables.append(PageBreak())
+            continue
         
         # 1. Code Block Handling
         if stripped.startswith('```'):
@@ -207,9 +194,15 @@ def parse_markdown_to_flowables(filepath, styles):
         if stripped.startswith('![') and '](' in stripped:
             img_path = stripped.split('](')[1].split(')')[0]
             if os.path.exists(img_path):
-                # Check if it is the logo or silhouette, assign dimensions
-                size = 180 if "pj_logo" in img_path else 150
-                img = Image(img_path, width=size, height=size)
+                # Check for logo and assign proportional dimensions to avoid distortion
+                if "google_logo" in img_path:
+                    img = Image(img_path, width=145, height=50)
+                elif "kaggle_logo" in img_path:
+                    img = Image(img_path, width=130, height=50)
+                elif "pj_logo" in img_path:
+                    img = Image(img_path, width=180, height=180)
+                else:
+                    img = Image(img_path, width=150, height=150)
                 img.hAlign = 'CENTER'
                 flowables.append(Spacer(1, 8))
                 flowables.append(img)
