@@ -34,6 +34,43 @@ class NumberedCanvas(canvas.Canvas):
             if os.path.exists("assets/pj_logo.jpg"):
                 # Center square image vertically (y = (792 - 612) / 2 = 90)
                 self.drawImage("assets/pj_logo.jpg", 0, 90, width=612, height=612)
+            
+            # --- Movie Poster Style Additions ---
+            # 1. Top Title (PROJECT:)
+            self.setFillColor(colors.HexColor("#94A3B8")) # slate-400
+            self.setFont("Helvetica-Bold", 16)
+            self.drawCentredString(306, 736, "P  R  O  J  E  C  T  :")
+            
+            # 2. Bottom Movie Rating Box (RATED PJ FOR: POD JOBS)
+            box_w = 260
+            box_h = 44
+            box_x = 306 - (box_w / 2) # 176
+            box_y = 25
+            
+            # Draw rating box border (white, thin)
+            self.setStrokeColor(colors.white)
+            self.setLineWidth(1.2)
+            self.rect(box_x, box_y, box_w, box_h, fill=False, stroke=True)
+            
+            # Draw vertical divider line inside rating box
+            div_x = box_x + 85
+            self.line(div_x, box_y, div_x, box_y + box_h)
+            
+            # Left rating text
+            self.setFillColor(colors.white)
+            self.setFont("Helvetica-Bold", 8)
+            self.drawCentredString(box_x + 42.5, box_y + 28, "RATED")
+            self.setFont("Helvetica-Bold", 18)
+            self.drawCentredString(box_x + 42.5, box_y + 8, "PJ")
+            
+            # Right explanation text
+            self.setFont("Helvetica-Bold", 7.5)
+            self.drawString(box_x + 95, box_y + 28, "FOR: POD JOBS")
+            self.setFont("Helvetica", 6.5)
+            self.drawString(box_x + 95, box_y + 18, "DYNAMIC MULTI-AGENT SWARMS")
+            self.drawString(box_x + 95, box_y + 8, "UNDER HUMAN SUPERVISION")
+            # ------------------------------------
+            
             self.restoreState()
             return
         
