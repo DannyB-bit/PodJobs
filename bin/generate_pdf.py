@@ -254,7 +254,10 @@ def parse_markdown_to_flowables(filepath, styles):
         else:
             # Paragraph
             text = format_inline(stripped)
-            flowables.append(Paragraph(text, styles['BodyCustom']))
+            if "Architect &amp; Author" in text or "Platform:" in text or "Build Status:" in text:
+                flowables.append(Paragraph(text, styles['MetadataCentred']))
+            else:
+                flowables.append(Paragraph(text, styles['BodyCustom']))
             flowables.append(Spacer(1, 8))
 
     return flowables
@@ -352,6 +355,16 @@ def main():
         leading=13.5,
         textColor=colors.HexColor('#334155'),
         alignment=TA_JUSTIFY,
+        spaceAfter=8
+    ))
+
+    styles.add(ParagraphStyle(
+        name='MetadataCentred',
+        fontName='Helvetica',
+        fontSize=9.5,
+        leading=13.5,
+        textColor=colors.HexColor('#334155'),
+        alignment=TA_CENTER,
         spaceAfter=8
     ))
 
