@@ -164,7 +164,9 @@ Overall System Resilience:
 
 > — **Devs One** (Danny Bouldiez)
 
-🧬 H U M A N 🧬
+![human_dna_microscope](./assets/human_dna_microscope.png)
+
+`H U M A N  -  D N A  S E Q U E N C E  A T T E S T A T I O N`
 
 <pagebreak/>
 

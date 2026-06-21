@@ -251,6 +251,12 @@ def parse_markdown_to_flowables(filepath, styles):
                     flowables.append(Spacer(1, 15))
                     flowables.append(img)
                     flowables.append(Spacer(1, 15))
+                elif "human_dna_microscope" in img_path:
+                    img = Image(img_path, width=220, height=220)
+                    img.hAlign = 'CENTER'
+                    flowables.append(Spacer(1, 10))
+                    flowables.append(img)
+                    flowables.append(Spacer(1, 10))
                 else:
                     img = Image(img_path, width=150, height=150)
                     img.hAlign = 'CENTER'
