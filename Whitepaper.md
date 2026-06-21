@@ -1,6 +1,7 @@
+### Kaggle 5-Day Intensive: AI Agents Capstone Project (June 15 - 19, 2026) Hosted by Google
+
 ![Project PJ Logo](assets/pj_logo.jpg)
 
-### Kaggle 5-Day Intensive: AI Agents Capstone Project (June 15 - 19, 2026) Hosted by Google
 **Architect & Author:** Devs One — Danny Bouldiez  
 **Platform:** Google AI Studio, Google Antigravity, and Nous Research Hermes Agent  
 **Build Status:** Deployed & Live  
