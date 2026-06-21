@@ -196,17 +196,29 @@ def parse_markdown_to_flowables(filepath, styles):
             if os.path.exists(img_path):
                 # Check for logo and assign proportional dimensions to avoid distortion
                 if "google_logo" in img_path:
-                    img = Image(img_path, width=261, height=90)
+                    img = Image(img_path, width=319, height=110)
+                    img.hAlign = 'CENTER'
+                    flowables.append(Spacer(1, 35))  # push down Google logo
+                    flowables.append(img)
+                    flowables.append(Spacer(1, 15))
                 elif "kaggle_logo" in img_path:
-                    img = Image(img_path, width=234, height=90)
+                    img = Image(img_path, width=286, height=110)
+                    img.hAlign = 'CENTER'
+                    flowables.append(Spacer(1, 25))  # push down Kaggle logo
+                    flowables.append(img)
+                    flowables.append(Spacer(1, 15))
                 elif "pj_logo" in img_path:
                     img = Image(img_path, width=180, height=180)
+                    img.hAlign = 'CENTER'
+                    flowables.append(Spacer(1, 8))
+                    flowables.append(img)
+                    flowables.append(Spacer(1, 8))
                 else:
                     img = Image(img_path, width=150, height=150)
-                img.hAlign = 'CENTER'
-                flowables.append(Spacer(1, 8))
-                flowables.append(img)
-                flowables.append(Spacer(1, 8))
+                    img.hAlign = 'CENTER'
+                    flowables.append(Spacer(1, 8))
+                    flowables.append(img)
+                    flowables.append(Spacer(1, 8))
             continue
 
         # 4. Header Handling
