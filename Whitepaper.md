@@ -154,7 +154,7 @@ Overall System Resilience:
 * **Graceful Failure**: Under simulated API failures (Phase 2), the system caught 100% of errors and triggered the fallback simulation engine in under 0.55 seconds.
 * **Absolute Uptime**: Zero requests failed, confirming complete robustness.
 
----
+<pagebreak/>
 
 ## 🎨 Attestation & Sign-off
 
