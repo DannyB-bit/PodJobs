@@ -144,6 +144,20 @@ def parse_markdown_to_flowables(filepath, styles):
             flowables.append(PageBreak())
             continue
 
+        # Custom DNA ASCII art handling
+        if stripped == "🧬 H U M A N 🧬":
+            ascii_art = (
+                "AA&nbsp;&nbsp;&nbsp;&nbsp;AA&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;GG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CCCC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;TT<br/>"
+                "AA&nbsp;&nbsp;&nbsp;&nbsp;AA&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;GGG&nbsp;&nbsp;&nbsp;&nbsp;GGG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CC&nbsp;&nbsp;CC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TTT&nbsp;&nbsp;&nbsp;TT<br/>"
+                "AAAAAAAA&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;GG&nbsp;G&nbsp;&nbsp;G&nbsp;GG&nbsp;&nbsp;&nbsp;&nbsp;CCCCCCCC&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;T&nbsp;&nbsp;TT<br/>"
+                "AA&nbsp;&nbsp;&nbsp;&nbsp;AA&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;&nbsp;GG&nbsp;&nbsp;GG&nbsp;&nbsp;GG&nbsp;&nbsp;&nbsp;&nbsp;CC&nbsp;&nbsp;&nbsp;&nbsp;CC&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;T&nbsp;TT<br/>"
+                "AA&nbsp;&nbsp;&nbsp;&nbsp;AA&nbsp;&nbsp;&nbsp;&nbsp;TTTTTTTT&nbsp;&nbsp;&nbsp;&nbsp;GG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GG&nbsp;&nbsp;&nbsp;&nbsp;CC&nbsp;&nbsp;&nbsp;&nbsp;CC&nbsp;&nbsp;&nbsp;&nbsp;TT&nbsp;&nbsp;&nbsp;TTT"
+            )
+            flowables.append(Spacer(1, 10))
+            flowables.append(Paragraph(ascii_art, styles['HumanDnaStyle']))
+            flowables.append(Spacer(1, 10))
+            continue
+
         # Custom horizontal rule handling
         if stripped == '---' or stripped == '___':
             flowables.append(Spacer(1, 10))
@@ -362,6 +376,17 @@ def main():
         fontName='Times-BoldItalic',
         fontSize=40,
         leading=46,
+        textColor=colors.HexColor('#0F172A'),
+        alignment=TA_CENTER,
+        spaceBefore=15,
+        spaceAfter=15
+    ))
+
+    styles.add(ParagraphStyle(
+        name='HumanDnaStyle',
+        fontName='Courier-Bold',
+        fontSize=8,
+        leading=10,
         textColor=colors.HexColor('#0F172A'),
         alignment=TA_CENTER,
         spaceBefore=15,
