@@ -434,9 +434,9 @@ def main():
     styles.add(ParagraphStyle(
         name='DisclaimerStyle',
         fontName='Helvetica-Oblique',
-        fontSize=9.5,
-        leading=13.5,
-        textColor=colors.HexColor('#334155'),
+        fontSize=11.0,
+        leading=15.5,
+        textColor=colors.HexColor('#1E293B'),
         alignment=TA_CENTER,
         leftIndent=36,
         rightMargin=36,
