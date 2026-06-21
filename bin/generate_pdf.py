@@ -348,6 +348,7 @@ def main():
         leading=42,
         textColor=colors.HexColor('#0F172A'),
         alignment=TA_CENTER,
+        rightIndent=20,         # Optically shifted left to match brand logos alignment
         spaceBefore=40,
         spaceAfter=15
     ))
