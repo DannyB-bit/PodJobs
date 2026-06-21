@@ -16,6 +16,29 @@ By combining the **Google GenAI SDK**, **Model Context Protocol (MCP)**, **NVIDI
 
 ---
 
+## 🎬 The On-Going PLOT and The Solution
+
+### The Corporate Harvest: When Job Hunting Becomes a Data Mine
+Imagine this: You’ve spent six years mastering blockchain, Web3, neural networks, and the complex plumbing of edge IoT. You are ready to build the future. But the job market you step into isn't looking to hire you—it’s looking to *harvest* you. 
+
+Today, U.S. job seekers face a predatory trend. You submit your resume, jump through hoops, and get called into multi-stage technical interviews. But these interviews are no longer evaluation channels. Behind the scenes, managers deploy AI systems to extract your database schemas, scrape your deployment techniques, and farm your architectural knowledge. Once your mind is cataloged into their training models, their system auto-fires a generic, copy-paste template rejection: *"We chose a candidate who matches our needs more closely."* No pay. No compensation. Your intellectual property has been farmed, and you are left facing financial hardship.
+
+### The Rise of AI-Driven Restructuring
+This isn't an isolated headache; it is a systemic crisis. According to data from Challenger, Gray & Christmas, U.S. employers announced a massive surge of **38,579 AI-driven job cuts in May 2026 alone**—accounting for nearly 40% of all layoffs that month. We see giants like Block cutting 4,000 roles to make way for their proprietary "Goose" automation engine, and Coinbase slashing 14% of their staff to force engineers into "single-person pods." 
+
+The corporate theology is simple: *maximize profits, minimize expenses, displace the human.* But turning families' lives upside down just to pad quarterly balance sheets is not innovation. It is a design failure. 
+
+### The PJ Manifesto: Reclaiming Autonomy with Recycled E-Waste
+We refused to be automated out. We refused to let our knowledge be farmed. 
+
+So, we gathered the e-waste collecting dust in our closets—old Raspberry Pi boards and Helium RAK miners from the early Web3 mining boom. We flashed them, sandboxed them, and turned them into **Project PJ (PodJobs.ai)**. 
+
+Project PJ is not an app or a digital commodity. It is a paradigm shift. Instead of displacing workers, we teach them to pilot their own **Sovereign Agent Pods**. We transition the human from a vulnerable cog to a high-productivity **Conductor** of a localized, 12-agent consensus department. By utilizing local offline execution frameworks like **Nous Research Hermes** and running them at the edge, the data never leaves your room. 
+
+The corporate solution is fear and layoffs. The **Project PJ** solution is remote work people love, local data sovereignty, and human-amplified productivity. We aren't replacing the team. We are giving the worker the power of a department.
+
+---
+
 ## 🛠️ The Challenge & The Solution
 
 | The Corporate Problem | Project PJ Solution |
