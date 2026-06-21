@@ -280,7 +280,7 @@ def parse_markdown_to_flowables(filepath, styles):
         elif stripped.startswith('## '):
             text = format_inline(stripped[3:])
             if "Attestation" in text:
-                flowables.append(Spacer(1, 150))  # push it to the middle of page 8
+                flowables.append(Spacer(1, 30))  # push it to the top/middle of page 8 nicely
                 flowables.append(Paragraph(text, styles['AttestationHeaderStyle']))
             else:
                 flowables.append(Paragraph(text, styles['Heading1Custom']))
