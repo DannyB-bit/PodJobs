@@ -84,9 +84,9 @@ class NumberedCanvas(canvas.Canvas):
             img_h = 400
             img_x = 306 - (img_w / 2)
             img_y = 260
-            if os.path.exists("assets/theaicollective_glow.jpg"):
-                # Center square image vertically (y = (792 - 612) / 2 = 90)
-                self.drawImage("assets/theaicollective_glow.jpg", img_x, img_y, width=img_w, height=img_h)
+            if os.path.exists("assets/pj_logo.jpg"):
+                # Center square image vertically
+                self.drawImage("assets/pj_logo.jpg", img_x, img_y, width=img_w, height=img_h)
                 
             # Draw white logo signature text below logo
             self.setFillColor(colors.white)
@@ -103,7 +103,7 @@ class NumberedCanvas(canvas.Canvas):
             self.setFont("Helvetica-Oblique", 8.5)
             self.drawCentredString(306, 145, "Special thanks to Kaggle and Google for hosting the")
             self.setFont("Helvetica-BoldOblique", 9)
-            self.drawCentredString(306, 130, "Kaggle 5-Day Intensive AI Agents Vibe Coding Course")
+            self.drawCentredString(306, 130, "Kaggle 5-Day Intensive AI Agents Vibe Coding Course (2026)")
             
             self.restoreState()
             return
