@@ -28,15 +28,23 @@ class NumberedCanvas(canvas.Canvas):
     def draw_page_number(self, page_count):
         if self._pageNumber == 1:
             self.saveState()
+            # Draw solid background matching the dark gradient of the PJ logo
+            self.setFillColor(colors.HexColor("#08090C"))
+            self.rect(0, 0, 612, 792, fill=True, stroke=False)
             if os.path.exists("assets/pj_logo.jpg"):
-                self.drawImage("assets/pj_logo.jpg", 0, 0, width=612, height=792)
+                # Center square image vertically (y = (792 - 612) / 2 = 90)
+                self.drawImage("assets/pj_logo.jpg", 0, 90, width=612, height=612)
             self.restoreState()
             return
         
         if self._pageNumber == page_count:
             self.saveState()
+            # Draw solid pure black background for the AI Collective logo
+            self.setFillColor(colors.HexColor("#000000"))
+            self.rect(0, 0, 612, 792, fill=True, stroke=False)
             if os.path.exists("assets/theaicollective_glow.jpg"):
-                self.drawImage("assets/theaicollective_glow.jpg", 0, 0, width=612, height=792)
+                # Center square image vertically (y = (792 - 612) / 2 = 90)
+                self.drawImage("assets/theaicollective_glow.jpg", 0, 90, width=612, height=612)
             self.restoreState()
             return
         
