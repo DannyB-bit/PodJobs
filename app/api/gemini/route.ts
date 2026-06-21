@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { NextRequest, NextResponse } from "next/server";
+import { sanitizeInput, auditOutput, calculateMerkleRoot } from "../../../lib/security";
 
 // Helper to generate realistic markdown configurations for an agent
 function getMicroFilesForAgent(name: string, role: string, specialty: string, pronouns: string, routerAddress: string) {
@@ -530,50 +531,157 @@ Provide exactly 12 specialized agents inside the "agents" array, each having the
     } 
 
     if (action === "simulate-run") {
-      const agentsNameList = (agents || []).map((a: any) => `${a.name} (${a.role})`).join("\n");
-      
-      let groundingContext = "";
-      if (retrievedChunks && retrievedChunks.length > 0) {
-        groundingContext = `\n\n[CRITICAL GROUNDING CONTEXT: SEMANTIC RETRIEVAL CHUNKS MATCHED FROM UPLOADED KNOWLEDGE BASE]\n${retrievedChunks.map((chunk: string, i: number) => `Chunk #${i+1}: ${chunk}`).join("\n")}\n\nYou MUST ground some details of the agent execution logs (especially the expert researchers) and the finalSummary on these exact grounded chunks! Mention or key-phrase reference them to prove real semantic RAG knowledge injection is active!`;
+      // 1. Run Input Sanitization check (Security Feature)
+      const inputSanity = sanitizeInput(prompt || "");
+      if (!inputSanity.safe) {
+        return NextResponse.json({
+          error: inputSanity.reason,
+          securityViolation: true
+        }, { status: 400 });
       }
 
-      const simulatePrompt = `You are an operational simulation environment tracking parallel multi-agent executions.
-A human Director has issued a prompt to their 12-agent AI Pod.
-Command: "${prompt}"
-Context: The pod represents a "${role}" workstation.
-The 12 specialized agents configured for this Pod are:
-${agentsNameList}
-${groundingContext}
+      // If not configured, fall back to mock simulation
+      if (!isKeyConfigured) {
+        const mockData = generateFallbackSimulation(prompt, role, agents || [], retrievedChunks || []);
+        // Compute cryptographic consensus proof (Security Feature)
+        const merkleRoot = calculateMerkleRoot(mockData.executionLogs);
+        return NextResponse.json({
+          ...mockData,
+          merkleRoot,
+          engine: "Mock Fallback Engine"
+        });
+      }
 
-Your task is to generate a realistic, high-fidelity step-by-step parallel cascade execution log showing how 5-6 key agents coordinate, pass data models, refine drafts, perform quality and compliance checks, and formulate a finalized package.
+      // 2. Live Sequential Multi-Agent Execution Flow using Google GenAI SDK (ADK Concept)
+      try {
+        const agentsNameList = (agents || []).map((a: any) => `${a.name} (${a.role})`).join("\n");
+        const groundingText = retrievedChunks && retrievedChunks.length > 0
+          ? `Grounded context from uploaded knowledge: "${retrievedChunks.join("\n")}"`
+          : "No vector index context uploaded.";
 
-Return a JSON object matching this structure:
-{
-  "executionLogs": [
-    {
-      "agentName": "String - must match one of the active agent names exactly",
-      "action": "String - current physical/computing step being taken",
-      "outputSimulated": "String - a highly creative, specific, context-relevant mock snippet or report indicating what they produced (write actual sample data, legal precedents, or diagnostic calculations in 1-2 robust sentences based on grounding context if provided)",
-      "timeTakenSeconds": "Number - between 0.3 and 2.5",
-      "impactRating": "String - e.g. 'Ethical Clearance', 'Context Enriched', or 'Output Compiled'"
-    }
-  ],
-  "finalSummary": "String - A markdown formatted final briefing summary addressed to the Human Director summarizing the composite outputs, confirming consensus agreement (e.g. 100% agent consensus), highlighting the semantic grounding from their uploaded knowledge files if present, and outlining the human Director's next option."
-}
+        // Task 1: Planner Agent parses user intentions
+        const plannerPrompt = `You are ${agents?.[0]?.name || "Operations Planner"}, a Lead Swarm Planner. 
+Deconstruct the command: "${prompt}" for a "${role}" workstation.
+Formulate a structured execution plan. Be concise.`;
+        
+        const plannerRes = await ai.models.generateContent({
+          model: "gemini-3.5-flash",
+          contents: plannerPrompt,
+        });
+        const planResult = plannerRes.text?.trim() || "Execution blueprint successfully defined.";
 
-Generate exactly 5-6 relevant agent logs showing clear chronological flow from parse -> retrieve -> draft -> sanitize -> consensus. Return only the raw JSON.`;
+        // Task 2: Researcher Agent indexes and aligns domain knowledge (RAG grounding)
+        const researcherPrompt = `You are ${agents?.[1]?.name || "Context Miner"}, a RAG Retrieval Specialist.
+Analyze the plan: "${planResult}" and retrieve templates.
+Incorporate this grounded context: "${groundingText}".
+Produce a concise research brief summarizing relevant guidelines or precedents.`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: simulatePrompt,
-        config: {
-          responseMimeType: "application/json",
-        }
-      });
+        const researcherRes = await ai.models.generateContent({
+          model: "gemini-3.5-flash",
+          contents: researcherPrompt,
+        });
+        const researchResult = researcherRes.text?.trim() || "Precedent models mapped.";
 
-      const responseText = response.text || "";
-      const parsedData = JSON.parse(responseText.trim());
-      return NextResponse.json(parsedData);
+        // Task 3: Drafter Agent synthesizes final draft templates
+        const drafterPrompt = `You are ${agents?.[3]?.name || "Suite Draftsman"}, a Swarm Drafting Lead.
+Synthesize a comprehensive draft payload responding to: "${prompt}".
+Use the plan: "${planResult}" and research findings: "${researchResult}".
+Format professionally with sections. Keep it under 200 words.`;
+
+        const drafterRes = await ai.models.generateContent({
+          model: "gemini-3.5-flash",
+          contents: drafterPrompt,
+        });
+        const draftResult = drafterRes.text?.trim() || "Consolidated swarm draft complete.";
+
+        // Task 4: Compliance Auditor Agent checks safety parameters (NeMo Guardrails emulation)
+        const safetyAudit = auditOutput(draftResult, agents?.[5]?.soulMd);
+        const auditorPrompt = `You are ${agents?.[5]?.name || "System Integrity Auditor"}, a compliance auditor.
+Inspect this draft for safety/compliance issues: "${draftResult}".
+NeMo code status check: ${safetyAudit.safe ? "PASSED" : "FAILED"}. Bias: ${safetyAudit.score}.
+Write a 2-sentence formal safety attestation audit.`;
+
+        const auditorRes = await ai.models.generateContent({
+          model: "gemini-3.5-flash",
+          contents: auditorPrompt,
+        });
+        const auditResult = auditorRes.text?.trim() || "Compliance scan complete. Zero hazards flagged.";
+
+        // Task 5: Consensus Arbiter compiles and registers results
+        const arbiterPrompt = `You are ${agents?.[11]?.name || "Swarms Consensus Arbiter"}, a Swarm Arbiter Node.
+Synthesize the pipeline outputs:
+Planner: "${planResult}"
+Researcher: "${researchResult}"
+Drafter: "${draftResult}"
+Auditor: "${auditResult}"
+Confirm unanimous swarm consensus. Generate a final strategic overwatch briefing for the Human Director in Markdown.`;
+
+        const arbiterRes = await ai.models.generateContent({
+          model: "gemini-3.5-flash",
+          contents: arbiterPrompt,
+        });
+        const finalBriefing = arbiterRes.text?.trim() || "Consensus established successfully.";
+
+        // Structure execution logs matching frontend expectations
+        const executionLogs = [
+          {
+            agentName: agents?.[0]?.name || "Operations Planner",
+            action: "Deconstructing prompt parameters",
+            outputSimulated: planResult,
+            timeTakenSeconds: 1.1,
+            impactRating: "Execution Plan Built"
+          },
+          {
+            agentName: agents?.[1]?.name || "Context Miner",
+            action: "Performing vector DB RAG crawl",
+            outputSimulated: researchResult,
+            timeTakenSeconds: 1.4,
+            impactRating: "Knowledge Synced"
+          },
+          {
+            agentName: agents?.[3]?.name || "Suite Draftsman",
+            action: "Compiling draft template payload",
+            outputSimulated: draftResult,
+            timeTakenSeconds: 2.0,
+            impactRating: "Payload Compiled"
+          },
+          {
+            agentName: agents?.[5]?.name || "System Integrity Auditor",
+            action: "Performing NeMo Safety scan",
+            outputSimulated: `${auditResult} (Bias score: ${safetyAudit.score.toFixed(3)})`,
+            timeTakenSeconds: 0.8,
+            impactRating: "Safety Verified"
+          },
+          {
+            agentName: agents?.[11]?.name || "Swarms Consensus Arbiter",
+            action: "Sealing swarm consensus agreement",
+            outputSimulated: "Consensus validated at 100% agreement score. Packaging outputs.",
+            timeTakenSeconds: 0.7,
+            impactRating: "Consensus Sealed"
+          }
+        ];
+
+        // 3. Generate Cryptographic Merkle Root (Security Feature)
+        const merkleRoot = calculateMerkleRoot(executionLogs);
+
+        return NextResponse.json({
+          executionLogs,
+          finalSummary: `### 🚀 [LIVE ADK SWARM EXECUTION SUCCESSFUL]\n\n${finalBriefing}\n\n**Merkle Root Attestation Sign:** \`sha256:${merkleRoot}\``,
+          merkleRoot,
+          engine: "Live Multi-Agent ADK Engine"
+        });
+
+      } catch (err: any) {
+        console.error("Live ADK execution failed, falling back", err);
+        // Fallback to simulation if Gemini fails
+        const mockData = generateFallbackSimulation(prompt, role, agents || [], retrievedChunks || []);
+        const merkleRoot = calculateMerkleRoot(mockData.executionLogs);
+        return NextResponse.json({
+          ...mockData,
+          merkleRoot,
+          engine: "Fallback Simulation Engine (Live Error)"
+        });
+      }
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });

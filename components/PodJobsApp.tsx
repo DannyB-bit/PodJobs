@@ -409,7 +409,7 @@ export default function Page() {
   // Dynamic Agent Handshake and Configuration terminal modal/drawer states
   const [selectedAgent, setSelectedAgent] = useState<any | null>(null);
   const [activeAgentTab, setActiveAgentTab] = useState<"chat" | "files">("chat");
-  const [selectedAgentFileName, setSelectedAgentFileName] = useState<"soul" | "agents" | "memory" | "safety" | "security">("soul");
+  const [selectedAgentFileName, setSelectedAgentFileName] = useState<"soul" | "agents" | "memory" | "safety" | "security" | "hermes">("soul");
   const [editedAgentFileContent, setEditedAgentFileContent] = useState<string>("");
   const [agentChatInput, setAgentChatInput] = useState<string>("");
   const [isAgentReplying, setIsAgentReplying] = useState<boolean>(false);
@@ -640,6 +640,9 @@ Believes that "The impossible is just code waiting to be written." This node str
       else if (selectedAgentFileName === "memory") content = selectedAgent.memoryMd || "";
       else if (selectedAgentFileName === "safety") content = selectedAgent.safetyMd || "";
       else if (selectedAgentFileName === "security") content = selectedAgent.securityMd || "";
+      else if (selectedAgentFileName === "hermes") {
+        content = JSON.stringify(selectedAgent.hermesConfig || {}, null, 2);
+      }
       
       const timer = setTimeout(() => {
         setEditedAgentFileContent(content);
@@ -651,13 +654,20 @@ Believes that "The impossible is just code waiting to be written." This node str
   const handleSaveEditedAgentFile = () => {
     if (!selectedAgent) return;
 
-    // Determine updated field key based on file name
     const updatedFields: any = {};
     if (selectedAgentFileName === "soul") updatedFields.soulMd = editedAgentFileContent;
     else if (selectedAgentFileName === "agents") updatedFields.agentsMd = editedAgentFileContent;
     else if (selectedAgentFileName === "memory") updatedFields.memoryMd = editedAgentFileContent;
     else if (selectedAgentFileName === "safety") updatedFields.safetyMd = editedAgentFileContent;
     else if (selectedAgentFileName === "security") updatedFields.securityMd = editedAgentFileContent;
+    else if (selectedAgentFileName === "hermes") {
+      try {
+        updatedFields.hermesConfig = JSON.parse(editedAgentFileContent);
+      } catch (e) {
+        alert("Invalid JSON format for Hermes configuration.");
+        return;
+      }
+    }
 
     const updatedAgent = { ...selectedAgent, ...updatedFields };
     setSelectedAgent(updatedAgent);
@@ -802,7 +812,7 @@ Believes that "The impossible is just code waiting to be written." This node str
   const [uploadedFiles, setUploadedFiles] = useState<{ id: string; name: string; size: string }[]>([]);
   const [dragActive, setDragActive] = useState<boolean>(false);
   const [activeFramework, setActiveFramework] = useState<"gcp" | "openclaw" | "nemo">("gcp");
-  const [creatorPanelTab, setCreatorPanelTab] = useState<"command" | "rag" | "brain" | "adaptors">("command");
+  const [creatorPanelTab, setCreatorPanelTab] = useState<"command" | "rag" | "brain" | "adaptors" | "mcp">("command");
   const [copiedConfig, setCopiedConfig] = useState<boolean>(false);
 
   // Semantic retrieval matcher
@@ -2799,6 +2809,17 @@ if __name__ == "__main__":
                           >
                             Adapt Swarm
                           </button>
+                          <button
+                            type="button"
+                            onClick={() => setCreatorPanelTab("mcp")}
+                            className={`px-3 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-t border-t-2 transition-all ${
+                              creatorPanelTab === "mcp"
+                                ? "text-cyan-400 bg-[#05070a] border-cyan-400"
+                                : "text-slate-500 border-transparent hover:text-slate-300"
+                            }`}
+                          >
+                            MCP & CLI
+                          </button>
                         </div>
 
                         {creatorPanelTab === "command" && (
@@ -3273,6 +3294,53 @@ if __name__ == "__main__":
                             </div>
                           </div>
                         )}
+
+                        {creatorPanelTab === "mcp" && (
+                          <div className="space-y-4 animate-fade-in text-left">
+                            <h5 className="font-sans font-bold text-sm text-white uppercase tracking-wider flex items-center gap-2">
+                              <Cpu className="w-4 h-4 text-cyan-400 animate-pulse" />
+                              Model Context Protocol & CLI Skills
+                            </h5>
+                            <p className="text-xs text-slate-400 leading-normal">
+                              Fully compatible out-of-the-box with modern AI editors (Cursor, Claude Desktop, etc.) and native shell agent scripts!
+                            </p>
+
+                            {/* MCP Section */}
+                            <div className="p-3.5 bg-[#050608]/90 border border-slate-800 rounded-lg space-y-2">
+                              <span className="font-bold text-[11px] text-cyan-400 uppercase tracking-wider block font-sans">
+                                🔌 Standard MCP Server Protocol
+                              </span>
+                              <p className="text-[10px] text-slate-400 leading-normal">
+                                Connect your client (Cursor/Claude) directly to this workspace using JSON-RPC stdio. Exposes tools to inspect agent states, configurations, and execute workflow runs.
+                              </p>
+                              <div className="font-mono text-[9px] text-slate-300 bg-black/60 p-2 rounded border border-slate-800">
+                                <div className="text-slate-500 font-bold"># Start the MCP Server process</div>
+                                node mcp-server/index.js
+                              </div>
+                              <div className="text-[9px] text-slate-500 font-mono pl-1 space-y-0.5">
+                                <div>• <span className="text-cyan-400">list_agent_pods</span>: Fetch active pods list</div>
+                                <div>• <span className="text-cyan-400">get_agent_manifest</span>: Read node SOUL/SAFETY configs</div>
+                                <div>• <span className="text-cyan-400">run_swarm_simulation</span>: Execute workload consensus runs</div>
+                              </div>
+                            </div>
+
+                            {/* CLI Skills Section */}
+                            <div className="p-3.5 bg-[#050608]/90 border border-slate-800 rounded-lg space-y-2">
+                              <span className="font-bold text-[11px] text-yellow-500 uppercase tracking-wider block font-sans">
+                                🐚 Agent CLI Skill Tool (podjobs-cli)
+                              </span>
+                              <p className="text-[10px] text-slate-400 leading-normal">
+                                Interact with and run simulations or real ADK multi-agent tasks from your standard command terminal.
+                              </p>
+                              <div className="font-mono text-[9.5px] text-slate-300 bg-black/60 p-2 rounded border border-slate-800 space-y-1">
+                                <div><span className="text-slate-500"># Show help panel</span><br />node bin/podjobs-cli.js --help</div>
+                                <div><span className="text-slate-500"># List all active pods</span><br />node bin/podjobs-cli.js list</div>
+                                <div><span className="text-slate-500"># Run a simulation run on legal pod</span><br />node bin/podjobs-cli.js simulate "Draft contract review" --pod legal</div>
+                                <div><span className="text-slate-500"># Run a live Gemini-backed pipeline cascade</span><br />node bin/podjobs-cli.js run "Verify tax code splits" --pod insurance</div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Right: Simulated Command Logs screen / results */}
@@ -3338,9 +3406,17 @@ if __name__ == "__main__":
                                     transition={{ delay: 0.5 }}
                                     className="border border-cyan-500/30 bg-cyan-950/10 p-5 rounded-xl text-slate-250 font-sans space-y-3 mt-4"
                                   >
-                                    <span className="font-mono text-[9px] font-bold text-cyan-400 bg-cyan-950 border border-cyan-805 px-2 py-0.5 rounded-sm block w-max uppercase tracking-wider">
-                                      Consolidated Release Package Brief
-                                    </span>
+                                    <div className="flex flex-wrap justify-between items-center gap-2 border-b border-cyan-900/40 pb-2">
+                                      <span className="font-mono text-[9px] font-bold text-cyan-400 bg-cyan-950 border border-cyan-800 px-2 py-0.5 rounded-sm block w-max uppercase tracking-wider">
+                                        Consolidated Release Package Brief
+                                      </span>
+                                      {customSimResults.merkleRoot && (
+                                        <span className="font-mono text-[8.5px] text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800/80 max-w-xs truncate" title={`sha256:${customSimResults.merkleRoot}`}>
+                                          <span className="text-slate-500 font-bold uppercase mr-1">Merkle Proof:</span>
+                                          {customSimResults.merkleRoot.substring(0, 16)}...
+                                        </span>
+                                      )}
+                                    </div>
                                     <div className="text-xs text-slate-300 leading-relaxed space-y-2 whitespace-pre-wrap">
                                       {customSimResults.finalSummary}
                                     </div>
@@ -3505,7 +3581,8 @@ if __name__ == "__main__":
                             { key: "agents", label: "agents.md" },
                             { key: "memory", label: "memory.md" },
                             { key: "safety", label: "safety.md" },
-                            { key: "security", label: "security.md" }
+                            { key: "security", label: "security.md" },
+                            { key: "hermes", label: "hermes.json" }
                           ].map(file => (
                             <button
                               type="button"
