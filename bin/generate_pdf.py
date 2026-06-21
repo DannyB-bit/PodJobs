@@ -247,7 +247,7 @@ def parse_markdown_to_flowables(filepath, styles):
             # Page Title
             text = format_inline(stripped[2:])
             if text == "WE ARE":
-                flowables.append(Spacer(1, 40))  # push it down even more
+                flowables.append(Spacer(1, 15))  # push it down slightly
                 flowables.append(Paragraph(text, styles['WeAreStyle']))
             elif text == "I AM":
                 flowables.append(Paragraph(text, styles['IAmStyle']))
@@ -348,7 +348,7 @@ def main():
         leading=42,
         textColor=colors.HexColor('#0F172A'),
         alignment=TA_CENTER,
-        spaceBefore=40,
+        spaceBefore=15,
         spaceAfter=15
     ))
 
