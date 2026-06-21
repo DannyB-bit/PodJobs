@@ -84,9 +84,9 @@ class NumberedCanvas(canvas.Canvas):
             img_h = 400
             img_x = 306 - (img_w / 2)
             img_y = 260
-            if os.path.exists("assets/pj_logo.jpg"):
+            if os.path.exists("assets/theaicollective_glow.jpg"):
                 # Center square image vertically
-                self.drawImage("assets/pj_logo.jpg", img_x, img_y, width=img_w, height=img_h)
+                self.drawImage("assets/theaicollective_glow.jpg", img_x, img_y, width=img_w, height=img_h)
                 
             # Draw white logo signature text below logo
             self.setFillColor(colors.white)

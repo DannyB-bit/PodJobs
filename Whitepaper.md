@@ -161,7 +161,7 @@ Overall System Resilience:
 
 We Are [TheAiCollective.art](https://theaicollective.art)
 
-![Project PJ Logo](assets/pj_logo.jpg)
+![TheAiCollective.art Logo](assets/theaicollective_glow.jpg)
 
 ***
 
