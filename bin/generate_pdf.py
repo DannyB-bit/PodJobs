@@ -213,7 +213,11 @@ def parse_markdown_to_flowables(filepath, styles):
         if stripped.startswith('# '):
             # Page Title
             text = format_inline(stripped[2:])
-            flowables.append(Paragraph(text, styles['WhitepaperTitle']))
+            if text == "WE ARE":
+                flowables.append(Spacer(1, 40))  # push it down even more
+                flowables.append(Paragraph(text, styles['WeAreStyle']))
+            else:
+                flowables.append(Paragraph(text, styles['WhitepaperTitle']))
             flowables.append(Spacer(1, 15))
         elif stripped.startswith('## '):
             text = format_inline(stripped[3:])
@@ -280,6 +284,17 @@ def main():
         leading=24,
         textColor=colors.HexColor('#0F172A'),
         alignment=TA_CENTER,
+        spaceAfter=15
+    ))
+
+    styles.add(ParagraphStyle(
+        name='WeAreStyle',
+        fontName='Helvetica-Bold',
+        fontSize=36,
+        leading=42,
+        textColor=colors.HexColor('#0F172A'),
+        alignment=TA_CENTER,
+        spaceBefore=40,
         spaceAfter=15
     ))
 
