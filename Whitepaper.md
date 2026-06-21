@@ -16,10 +16,12 @@ By combining the **Google GenAI SDK**, **Model Context Protocol (MCP)**, **NVIDI
 
 ---
 
+*Disclaimer: The characters, organizations, and events depicted in the creative components of this document are fictional. Any resemblance to actual persons, living or dead, or real-world entities is purely coincidental and not intended by the author.*
+
 ## 🎬 The On-Going PLOT and The Solution
 
 ### The Corporate Harvest: When Job Hunting Becomes a Data Mine
-Imagine this: You’ve spent six years mastering blockchain, Web3, neural networks, and the complex plumbing of edge IoT. You are ready to build the future. But the job market you step into isn't looking to hire you—it’s looking to *harvest* you. 
+Imagine a future where you’ve spent six years mastering blockchain, Web3, neural networks, and the complex plumbing of edge IoT. You are ready to build the future. But the job market you step into isn't looking to hire you—it’s looking to *harvest* you. 
 
 Today, U.S. job seekers face a predatory trend. You submit your resume, jump through hoops, and get called into multi-stage technical interviews. But these interviews are no longer evaluation channels. Behind the scenes, managers deploy AI systems to extract your database schemas, scrape your deployment techniques, and farm your architectural knowledge. Once your mind is cataloged into their training models, their system auto-fires a generic, copy-paste template rejection: *"We chose a candidate who matches our needs more closely."* No pay. No compensation. Your intellectual property has been farmed, and you are left facing financial hardship.
 
@@ -28,7 +30,7 @@ This isn't an isolated headache; it is a systemic crisis. According to data from
 
 The corporate theology is simple: *maximize profits, minimize expenses, displace the human.* But turning families' lives upside down just to pad quarterly balance sheets is not innovation. It is a design failure. 
 
-### The PJ Manifesto: Reclaiming Autonomy with Recycled E-Waste
+### The PJ Vision: Reclaiming Autonomy with Recycled E-Waste
 We refused to be automated out. We refused to let our knowledge be farmed. 
 
 So, we gathered the e-waste collecting dust in our closets—old Raspberry Pi boards and Helium RAK miners from the early Web3 mining boom. We flashed them, sandboxed them, and turned them into **Project PJ (PodJobs.ai)**. 
