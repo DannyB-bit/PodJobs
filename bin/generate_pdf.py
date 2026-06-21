@@ -228,6 +228,8 @@ def parse_markdown_to_flowables(filepath, styles):
             if text == "WE ARE":
                 flowables.append(Spacer(1, 40))  # push it down even more
                 flowables.append(Paragraph(text, styles['WeAreStyle']))
+            elif text == "I AM":
+                flowables.append(Paragraph(text, styles['IAmStyle']))
             else:
                 flowables.append(Paragraph(text, styles['WhitepaperTitle']))
             flowables.append(Spacer(1, 15))
@@ -307,6 +309,17 @@ def main():
         textColor=colors.HexColor('#0F172A'),
         alignment=TA_CENTER,
         spaceBefore=40,
+        spaceAfter=15
+    ))
+
+    styles.add(ParagraphStyle(
+        name='IAmStyle',
+        fontName='Times-BoldItalic',
+        fontSize=40,
+        leading=46,
+        textColor=colors.HexColor('#0F172A'),
+        alignment=TA_CENTER,
+        spaceBefore=15,
         spaceAfter=15
     ))
 
