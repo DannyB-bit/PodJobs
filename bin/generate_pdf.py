@@ -107,6 +107,20 @@ class NumberedCanvas(canvas.Canvas):
         self.line(54, 52, 558, 52)
         self.restoreState()
 
+def draw_horizontal_line(color_hex='#CBD5E1', width=150, thickness=1):
+    t = Table([['']], colWidths=[width], rowHeights=[thickness])
+    t.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor(color_hex)),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 0),
+        ('TOPPADDING', (0,0), (-1,-1), 0),
+        ('LEFTPADDING', (0,0), (-1,-1), 0),
+        ('RIGHTPADDING', (0,0), (-1,-1), 0),
+    ]))
+    t.hAlign = 'CENTER'
+    return t
+
 def parse_markdown_to_flowables(filepath, styles):
     flowables = []
     
@@ -128,6 +142,13 @@ def parse_markdown_to_flowables(filepath, styles):
         # Custom pagebreak handling
         if stripped == '<pagebreak/>' or stripped == '---pagebreak---':
             flowables.append(PageBreak())
+            continue
+
+        # Custom horizontal rule handling
+        if stripped == '---' or stripped == '___':
+            flowables.append(Spacer(1, 10))
+            flowables.append(draw_horizontal_line(color_hex='#CBD5E1', width=150, thickness=0.8))
+            flowables.append(Spacer(1, 12))
             continue
         
         # 1. Code Block Handling
@@ -208,11 +229,11 @@ def parse_markdown_to_flowables(filepath, styles):
                     flowables.append(img)
                     flowables.append(Spacer(1, 15))
                 elif "pj_logo" in img_path:
-                    img = Image(img_path, width=180, height=180)
+                    img = Image(img_path, width=200, height=200)
                     img.hAlign = 'CENTER'
-                    flowables.append(Spacer(1, 8))
+                    flowables.append(Spacer(1, 15))
                     flowables.append(img)
-                    flowables.append(Spacer(1, 8))
+                    flowables.append(Spacer(1, 15))
                 else:
                     img = Image(img_path, width=150, height=150)
                     img.hAlign = 'CENTER'
@@ -308,10 +329,11 @@ def main():
     styles.add(ParagraphStyle(
         name='WhitepaperTitle',
         fontName='Helvetica-Bold',
-        fontSize=20,
-        leading=24,
+        fontSize=24,
+        leading=28,
         textColor=colors.HexColor('#0F172A'),
         alignment=TA_CENTER,
+        spaceBefore=20,
         spaceAfter=15
     ))
 
@@ -372,11 +394,11 @@ def main():
     styles.add(ParagraphStyle(
         name='MetadataCentred',
         fontName='Helvetica',
-        fontSize=9.5,
-        leading=13.5,
-        textColor=colors.HexColor('#334155'),
+        fontSize=9.0,
+        leading=13,
+        textColor=colors.HexColor('#475569'),
         alignment=TA_CENTER,
-        spaceAfter=8
+        spaceAfter=5
     ))
 
     styles.add(ParagraphStyle(
