@@ -138,6 +138,21 @@ node bin/podjobs-cli.js run "Reconcile VAT filing rules" --pod insurance
 
 ---
 
+## 🧪 Deployed Production Validator Suite
+We have built a programmatic integration validator script, [validate-live-api.js](file:///k:/Cpastone-Project-kaggle5day/bin/validate-live-api.js), to test the end-to-end functionality of the live production environment.
+
+To run the suite and verify the live API:
+```bash
+node bin/validate-live-api.js
+```
+
+### What it Tests:
+1. **Dynamic Swarm Generation**: Requests a 12-agent Paralegal Pod dynamically from the server and validates the returned JSON schema structure and parameters.
+2. **Sequential Multi-Agent Cascade (ADK)**: Verifies that the 5-node sequential agent cascade executes correctly, applies NeMo safety checks, and seals the output with a cryptographic Merkle Root signature.
+3. **Direct Agent Handshake Chat**: Tests real-time communication with a specific agent node, checking tone compliance and pronouns.
+
+---
+
 ## 🏆 Kaggle Evaluation Metrics Mapping
 
 | Key Concept | Implementation Location | Demo Details |
