@@ -109,37 +109,28 @@
 
 /* Background resets for dark layouts */
 .theme-light,
-.theme-light .bg-\[\#06080D\],
-.theme-light .bg-\[\#040508\],
-.theme-light .bg-\[\#04060A\],
-.theme-light .bg-\[\#030509\],
-.theme-light .bg-\[\#050709\],
-.theme-light .bg-\[\#05070A\],
-.theme-light .bg-\[\#050608\],
-.theme-light .bg-\[\#070A0F\],
+.theme-light [class*="bg-[#06080D]"],
+.theme-light [class*="bg-[#040508]"],
+.theme-light [class*="bg-[#050709]"],
+.theme-light [class*="bg-[#05070A]"],
+.theme-light [class*="bg-[#050608]"],
+.theme-light [class*="bg-[#070A0F]"],
 .theme-light .bg-slate-950,
-.theme-light .bg-slate-900\/50[class*="backdrop-blur"] {
+.theme-light [class*="bg-slate-900"][class*="backdrop-blur"] {
   background-color: #F1F5F9 !important; /* Elegant light slate bg */
 }
 
 /* Main Cards to vibrant solid white card blocks */
-.theme-light .bg-\[\#090C12\],
-.theme-light .bg-\[\#0A0C10\],
-.theme-light .bg-\[\#0B0F19\],
-.theme-light .bg-\[\#0E1219\],
-.theme-light .bg-\[\#0F1218\],
-.theme-light .bg-\[\#0A0D14\],
-.theme-light .bg-\[\#0e121b\],
+.theme-light [class*="bg-[#090C12]"],
+.theme-light [class*="bg-[#0A0C10]"],
+.theme-light [class*="bg-[#0B0F19]"],
+.theme-light [class*="bg-[#0E1219]"],
+.theme-light [class*="bg-[#0F1218]"],
+.theme-light [class*="bg-[#0A0D14]"],
+.theme-light [class*="bg-[#e121b]"],
 .theme-light .bg-slate-900,
 .theme-light .bg-[#0F1218],
-.theme-light .bg-slate-900\/50,
-.theme-light .bg-\[\#0E1219\]\/75,
-.theme-light .bg-\[\#0E1219\]\/80,
-.theme-light .bg-\[\#090C12\]\/80,
-.theme-light .bg-\[\#090C12\]\/50,
-.theme-light .bg-\[\#090C12\]\/70,
-.theme-light .bg-\[\#090C12\]\/90,
-.theme-light .bg-\[\#0A0C10\]\/50 {
+.theme-light [class*="bg-slate-900"] {
   background-color: #FFFFFF !important;
 }
 
@@ -153,8 +144,8 @@
 }
 
 /* Dialogue screens & Modals */
-.theme-light .bg-\[\#04060A\]\/95,
-.theme-light .bg-\[\#030509\]\/90 {
+.theme-light [class*="bg-[#04060A]"],
+.theme-light [class*="bg-[#030509]"] {
   background-color: rgba(15, 23, 42, 0.6) !important; /* Keep nice dark overlay for dialogue backdrop */
   backdrop-filter: blur(8px) !important;
 }
@@ -163,7 +154,7 @@
 .theme-light .text-white,
 .theme-light .text-slate-100,
 .theme-light .text-slate-200,
-.theme-light .text-\[\#E2E8F0\],
+.theme-light .text-[#E2E8F0],
 .theme-light h1,
 .theme-light h2,
 .theme-light h3,
@@ -191,25 +182,24 @@
 }
 
 /* Hover/active state fixes */
-.theme-light .hover\:text-white:hover,
-.theme-light .hover\:text-slate-100:hover,
-.theme-light .group-hover\:text-white:hover,
-.theme-light .group:hover .group-hover\:text-white {
+.theme-light .hover:text-white:hover,
+.theme-light .hover:text-slate-100:hover,
+.theme-light .group-hover:text-white:hover,
+.theme-light .group:hover .group-hover:text-white {
   color: #0F172A !important;
 }
 
 /* Border overrides */
 .theme-light .border-slate-800,
 .theme-light .border-slate-850,
-.theme-light .border-slate-800\/80,
+.theme-light .border-slate-850,
 .theme-light .border-slate-805,
-.theme-light .border-white\/5,
-.theme-light .border-white\/10 {
+.theme-light [class*="border-slate-800"],
+.theme-light [class*="border-white"] {
   border-color: rgba(148, 163, 184, 0.18) !important;
 }
 
-.theme-light .border-slate-700\/50,
-.theme-light .border-white\/10 {
+.theme-light [class*="border-slate-700"] {
   border-color: rgba(148, 163, 184, 0.3) !important;
 }
 
@@ -244,7 +234,7 @@
 /* Terminal & Pre-formatted views */
 .theme-light pre,
 .theme-light .pre-element,
-.theme-light .bg-\[\#050608\] {
+.theme-light [class*="bg-[#050608]"] {
   background-color: #F8FAFC !important;
   border: 1px solid rgba(148, 163, 184, 0.25) !important;
   color: #0F172A !important;
@@ -258,7 +248,7 @@
 }
 
 /* Profile syncing state */
-.theme-light .bg-emerald-950\/40 {
+.theme-light [class*="bg-emerald-950"] {
   background-color: #E6F4EA !important;
   color: #137333 !important;
   border-color: rgba(19, 115, 51, 0.2) !important;
@@ -268,17 +258,17 @@
 }
 
 /* Urgent metrics alert */
-.theme-light .bg-[#EA4335]/15 {
+.theme-light [class*="bg-[#EA4335]"] {
   background-color: #FCE8E6 !important;
   color: #C5221F !important;
   border-color: rgba(197, 34, 31, 0.2) !important;
 }
 
 /* Shadow elevation structures */
-.theme-light .bg-\[\#090C12\],
-.theme-light .bg-\[\#0A0C10\],
-.theme-light .bg-\[\#0B0F19\],
-.theme-light .bg-\[\#0E1219\],
+.theme-light [class*="bg-[#090C12]"],
+.theme-light [class*="bg-[#0A0C10]"],
+.theme-light [class*="bg-[#0B0F19]"],
+.theme-light [class*="bg-[#0E1219]"],
 .theme-light [id^="agent_card_"] {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -4px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(148, 163, 184, 0.1) !important;
 }
