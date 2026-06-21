@@ -3831,6 +3831,15 @@ if __name__ == "__main__":
                 Privacy Policy
               </button>
               <span className="text-slate-800 font-bold select-none">&bull;</span>
+              <a 
+                href="/Whitepaper.pdf" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-cyan-400 text-cyan-500 transition-all cursor-pointer font-bold duration-200 hover:underline inline-block"
+              >
+                Project Whitepaper (PDF)
+              </a>
+              <span className="text-slate-800 font-bold select-none">&bull;</span>
               <button 
                 onClick={() => { setIsOnboardingOpen(true); }}
                 className="hover:text-[#FBBC05] transition-all cursor-pointer font-bold duration-200 hover:underline"

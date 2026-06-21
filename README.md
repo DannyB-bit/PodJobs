@@ -9,6 +9,8 @@
 [![Gemini 3.5 Flash](https://img.shields.io/badge/Powered%20By-Gemini%203.5%20Flash-blue?style=for-the-badge&logo=google)](https://ai.google.dev/)
 [![Model Context Protocol](https://img.shields.io/badge/Protocol-MCP-cyan?style=for-the-badge)](https://modelcontextprotocol.io/)
 
+📄 **[Download the Official Project PJ Whitepaper (PDF)](public/Whitepaper.pdf)** | 🌐 **[View Live Web App](https://podjobs.vercel.app)**
+
 PodJobs is a complete, production-ready **Multi-Agent Swarm Orchestration Platform** built for the **AI Agents: Intensive Vibe Coding Capstone Project**. 
 
 Rather than running simple, isolated single-agent bots, PodJobs implements **Intelligent Swarm Workstations** (Pods) consisting of **12 highly specialized, concurrent agents** managed by a **single Human Overwatch Supervisor**. This setup translates repetitive manual workflows (in customer service, legal filing, oncology imaging, risk claims) into parallel automated pipelines.
