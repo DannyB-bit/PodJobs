@@ -1,8 +1,4 @@
-# PROJECT PJ: A COGNITIVE AMPLIFIER FOR PROFESSIONAL SWARMS
-
-![Project PJ Logo](assets/pj_logo.jpg)
-
-### Kaggle 5-Day Intensive: AI Agents Capstone Project (June 15 - 19, 2026)
+### Kaggle 5-Day Intensive: AI Agents Capstone Project (June 15 - 19, 2026) Hosted by Google
 **Architect & Author:** Devs One — Danny Bouldiez  
 **Platform:** Google AI Studio, Google Antigravity, and Nous Research Hermes Agent  
 **Build Status:** Deployed & Live  
@@ -15,6 +11,10 @@ Conventional enterprise workflows scale horizontally by adding headcount—intro
 By combining the **Google GenAI SDK**, **Model Context Protocol (MCP)**, **NVIDIA NeMo Guardrails emulation**, and **cryptographic Merkle Root consensus signatures**, Project PJ provides a secure, zero-overhead workflow sandbox that scales capabilities instead of headcount.
 
 ---
+
+# PROJECT PJ: A COGNITIVE AMPLIFIER FOR PROFESSIONAL SWARMS
+
+<pagebreak/>
 
 *Disclaimer: The characters, organizations, and events depicted in the creative components of this document are fictional. Any resemblance to actual persons, living or dead, or real-world entities is purely coincidental and not intended by the author.*
 
