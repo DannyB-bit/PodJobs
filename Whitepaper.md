@@ -163,3 +163,9 @@ We Are [TheAiCollective.art](https://theaicollective.art)
 
 ![TheAiCollective.art Logo](assets/theaicollective_glow.jpg)
 
+***
+
+*This whitepaper and project was intended for educational and entertainment purposes.*
+
+*Special thanks to Kaggle and Google for hosting the Kaggle 5-Day Intensive AI Agents Vibe Coding Course.*
+

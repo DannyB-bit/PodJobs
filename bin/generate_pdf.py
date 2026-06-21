@@ -79,9 +79,32 @@ class NumberedCanvas(canvas.Canvas):
             # Draw solid pure black background for the AI Collective logo
             self.setFillColor(colors.HexColor("#000000"))
             self.rect(0, 0, 612, 792, fill=True, stroke=False)
+            
+            img_w = 400
+            img_h = 400
+            img_x = 306 - (img_w / 2)
+            img_y = 260
             if os.path.exists("assets/theaicollective_glow.jpg"):
                 # Center square image vertically (y = (792 - 612) / 2 = 90)
-                self.drawImage("assets/theaicollective_glow.jpg", 0, 90, width=612, height=612)
+                self.drawImage("assets/theaicollective_glow.jpg", img_x, img_y, width=img_w, height=img_h)
+                
+            # Draw white logo signature text below logo
+            self.setFillColor(colors.white)
+            self.setFont("Helvetica-Bold", 10)
+            self.drawCentredString(306, 210, "THEAICOLLECTIVE.ART")
+            
+            # Draw educational disclaimer below logo
+            self.setFillColor(colors.HexColor("#94A3B8")) # slate-400
+            self.setFont("Helvetica", 9)
+            self.drawCentredString(306, 175, "This whitepaper and project was intended for educational and entertainment purposes.")
+            
+            # Draw Kaggle and Google thank you note
+            self.setFillColor(colors.HexColor("#64748B")) # slate-500
+            self.setFont("Helvetica-Oblique", 8.5)
+            self.drawCentredString(306, 145, "Special thanks to Kaggle and Google for hosting the")
+            self.setFont("Helvetica-BoldOblique", 9)
+            self.drawCentredString(306, 130, "Kaggle 5-Day Intensive AI Agents Vibe Coding Course")
+            
             self.restoreState()
             return
         
