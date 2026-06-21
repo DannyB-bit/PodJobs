@@ -219,7 +219,7 @@ def parse_markdown_to_flowables(filepath, styles):
                 if "google_logo" in img_path:
                     img = Image(img_path, width=319, height=110)
                     img.hAlign = 'CENTER'
-                    flowables.append(Spacer(1, 35))  # push down Google logo
+                    flowables.append(Spacer(1, 100))  # push down Google logo
                     flowables.append(img)
                     flowables.append(Spacer(1, 15))
                 elif "kaggle_logo" in img_path:
