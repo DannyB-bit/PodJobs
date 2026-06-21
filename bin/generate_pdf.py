@@ -239,7 +239,18 @@ def parse_markdown_to_flowables(filepath, styles):
             flowables.append(Spacer(1, 8))
         elif stripped.startswith('### '):
             text = format_inline(stripped[4:])
-            flowables.append(Paragraph(text, styles['Heading2Custom']))
+            if "Kaggle 5-Day" in text:
+                transformed_text = (
+                    "<font face='Helvetica-Bold' size='11' color='#0F172A'>"
+                    "KAGGLE 5-DAY INTENSIVE: AI AGENTS CAPSTONE PROJECT"
+                    "</font><br/>"
+                    "<font face='Times-Italic' size='9.5' color='#475569'>"
+                    "June 15 - 19, 2026  •  Hosted by Google"
+                    "</font>"
+                )
+                flowables.append(Paragraph(transformed_text, styles['KaggleHeaderStyle']))
+            else:
+                flowables.append(Paragraph(text, styles['Heading2Custom']))
             flowables.append(Spacer(1, 6))
         elif stripped.startswith('> '):
             # Blockquote
@@ -366,6 +377,17 @@ def main():
         textColor=colors.HexColor('#334155'),
         alignment=TA_CENTER,
         spaceAfter=8
+    ))
+
+    styles.add(ParagraphStyle(
+        name='KaggleHeaderStyle',
+        fontName='Helvetica',
+        fontSize=11,
+        leading=15,
+        textColor=colors.HexColor('#0F172A'),
+        alignment=TA_CENTER,
+        spaceBefore=10,
+        spaceAfter=15
     ))
 
     styles.add(ParagraphStyle(
