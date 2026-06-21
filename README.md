@@ -159,8 +159,8 @@ node bin/validate-live-api.js
 
 | Key Concept | Implementation Location | Demo Details |
 | :--- | :--- | :--- |
-| **Agent / Multi-agent (ADK)** | [app/api/gemini/route.ts](file:///k:/Cpastone-Project-kaggle5day/app/api/gemini/route.ts) | 5-agent sequential execution pipeline using `@google/genai` |
-| **MCP Server** | [mcp-server/index.js](file:///k:/Cpastone-Project-kaggle5day/mcp-server/index.js) | Standard JSON-RPC stdio protocol server exposing pod controls |
-| **Security Features** | [lib/security.ts](file:///k:/Cpastone-Project-kaggle5day/lib/security.ts) | Injection filters, NeMo Safety Auditor, Cryptographic Merkle Root |
-| **Agent Skills** | [bin/podjobs-cli.js](file:///k:/Cpastone-Project-kaggle5day/bin/podjobs-cli.js) | CLI interface to query, list, inspect, and run swarms |
-| **Antigravity / Deploy** | [walkthrough.md](file:///C:/Users/DannyB/.gemini/antigravity-ide/brain/411754f9-230b-490b-9dca-a209f6c59fdf/walkthrough.md) | Documented setups, Vercel/Firebase instructions, and video walkthrough |
+| **Agent / Multi-agent (ADK)** | [app/api/gemini/route.ts](./app/api/gemini/route.ts) | 5-agent sequential execution pipeline using `@google/genai` |
+| **MCP Server** | [mcp-server/index.js](./mcp-server/index.js) | Standard JSON-RPC stdio protocol server exposing pod controls |
+| **Security Features** | [lib/security.ts](./lib/security.ts) | Injection filters, NeMo Safety Auditor, Cryptographic Merkle Root |
+| **Agent Skills** | [bin/podjobs-cli.js](./bin/podjobs-cli.js) | CLI interface to query, list, inspect, and run swarms |
+| **Antigravity / Deploy** | [AUDIT.md](./AUDIT.md) | Signed Forensic Data Audit and Evaluation verifying structural integrity |
