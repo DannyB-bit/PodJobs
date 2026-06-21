@@ -280,7 +280,10 @@ def parse_markdown_to_flowables(filepath, styles):
         elif stripped.startswith('> '):
             # Blockquote
             text = format_inline(stripped[2:])
-            flowables.append(Paragraph(text, styles['BlockquoteCustom']))
+            if "Special thanks" in text or "educational and entertainment" in text:
+                flowables.append(Paragraph(text, styles['DisclaimerStyle']))
+            else:
+                flowables.append(Paragraph(text, styles['BlockquoteCustom']))
             flowables.append(Spacer(1, 8))
         elif stripped.startswith('* ') or stripped.startswith('- '):
             # Bullet items
@@ -424,6 +427,19 @@ def main():
         textColor=colors.HexColor('#1E293B'),
         alignment=TA_CENTER,
         spaceAfter=15
+    ))
+
+    styles.add(ParagraphStyle(
+        name='DisclaimerStyle',
+        fontName='Helvetica-Oblique',
+        fontSize=8.0,
+        leading=11,
+        textColor=colors.HexColor('#475569'),
+        alignment=TA_CENTER,
+        leftIndent=36,
+        rightMargin=36,
+        spaceBefore=4,
+        spaceAfter=4
     ))
 
     styles.add(ParagraphStyle(

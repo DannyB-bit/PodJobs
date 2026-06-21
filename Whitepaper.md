@@ -167,7 +167,7 @@ Overall System Resilience:
 <pagebreak/>
 
 > *Special thanks to Kaggle and Google for hosting the Kaggle 5-Day Intensive AI Agents Vibe Coding Course (2026).*
-> 
+
 > *This whitepaper and project are intended for educational and entertainment purposes only. If we offended anyone, go talk to Chat.*
 
 ![Google Logo](assets/google_logo.png)
