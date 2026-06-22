@@ -36,35 +36,48 @@
   0%, 100% { transform: translateY(0px) rotate(0deg); }
   50% { transform: translateY(-8px) rotate(1deg); }
 }
-
 .animate-gradient-flow {
   animation: gradient-flow 12s linear infinite;
+  will-change: background-position;
+  transform: translate3d(0, 0, 0);
 }
 
 .animate-slow-spin {
   animation: slow-spin 35s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
 
 .animate-slow-spin-reverse {
   animation: slow-spin-reverse 45s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
 
 .animate-pulse-glow {
   animation: pulse-glow 12s ease-in-out infinite;
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .animate-pulse-glow-alt {
   animation: pulse-glow-alt 16s ease-in-out infinite;
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .animate-rainbow-glow {
   animation: rainbow-glow 6s linear infinite;
+  will-change: border-color, box-shadow;
 }
 
 .animate-float-gentle {
   animation: float-gentle 6s ease-in-out infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
-
 @keyframes agent-active-glow {
   0%, 100% {
     box-shadow: 0 0 8px var(--glow-color, rgba(34, 211, 238, 0.25)), inset 0 0 4px var(--glow-color, rgba(34, 211, 238, 0.1));

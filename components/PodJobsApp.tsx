@@ -1401,13 +1401,20 @@ Select a highly optimized model like Meta's Llama 3.1:
 ollama pull ${localModelName}
 \`\`\`
 
-### 4. Install Dependencies
-You'll need Python 3 installed. Then, install terminal UI and Hermes helper dependencies:
+### 4. Auto-Install the Hermes Framework (Recommended)
+We have included a user-friendly cross-platform python script to install the Hermes framework automatically on Linux, macOS, or Windows:
+\`\`\`bash
+python install_hermes.py
+\`\`\`
+This script automatically runs the official Hermes installation command based on your OS.
+
+### 5. Install Dependencies
+Install terminal UI and remaining helper dependencies:
 \`\`\`bash
 pip install -r requirements.txt
 \`\`\`
 
-### 5. Options to Launch the Swarm!
+### 6. Options to Launch the Swarm!
 
 #### Option A: Run via Hermes Agent Framework (Nous Research under-the-hood mode)
 This option executes your agents using the modern Hermes Framework, feeding the onboarded information directly.
@@ -1424,6 +1431,7 @@ python run_swarm.py
 ---
 
 ## 🗂️ Codebase Files Included:
+- \`install_hermes.py\`: User-friendly script to automatically install the hermes command based on your OS (Linux, Mac, Windows).
 - \`run_hermes.py\`: Advanced framework executor initialized with Nous Research \`hermes-agent\` SDK patterns and user onboarding presets.
 - \`run_swarm.py\`: Core agent sequencer and decision arbiter. Connects to local Ollama port \`localhost:11434\` directly.
 - \`agents_config.json\`: Contains profiles, productivity boosts, specialties, Hermes configurations, and workflow directives for your custom 12 agents.
@@ -1520,7 +1528,7 @@ if __name__ == "__main__":
 """
 ${customPodData.podName || "PodJobs.ai Swarm"} - Local Offline Orchestration Engine
 100% Private, Parallel Multi-Agent Swarm for: ${customRole}
-Generated automatically via AstronautSHE // TheAiCollective.art
+Generated automatically via PodJobs // TheAiCollective.art
 """
 
 import json
@@ -1657,7 +1665,58 @@ if __name__ == "__main__":
         print("\\nPipeline aborted by conductor.")
 `;
 
+      const installHermesScriptText = `#!/usr/bin/env python3
+"""
+PodJobs.ai - Hermes Framework Auto-Installer
+Detects OS and automatically runs the official Nous Research hermes-agent framework install command.
+"""
+
+import sys
+import platform
+import subprocess
+
+def install():
+    print("=" * 60)
+    print("🚀  PodJobs.ai - Auto-Installing hermes-agent framework...")
+    print("=" * 60)
+    
+    current_os = platform.system().lower()
+    print(f"Detected Operating System: {platform.system()} ({platform.release()})\\\\n")
+    
+    if current_os == "windows":
+        print("Running Windows installation via PowerShell...")
+        cmd = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", "irm https://hermes-agent.nousresearch.com/install.ps1 | iex"]
+        try:
+            subprocess.run(cmd, check=True)
+            print("\\\\n✓ [SUCCESS] hermes-agent framework installed successfully on Windows!")
+        except Exception as e:
+            print(f"\\\\n❌ [ERROR] PowerShell installation failed: {e}")
+            print("Please try running this command manually in Administrator PowerShell:")
+            print("  irm https://hermes-agent.nousresearch.com/install.ps1 | iex")
+            sys.exit(1)
+            
+    elif current_os in ["linux", "darwin"]:  # darwin is macOS
+        print(f"Running Unix installation via bash curl script on {platform.system()}...")
+        cmd = "curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash"
+        try:
+            subprocess.run(cmd, shell=True, check=True)
+            print(f"\\\\n✓ [SUCCESS] hermes-agent framework installed successfully on {platform.system()}!")
+        except Exception as e:
+            print(f"\\\\n❌ [ERROR] Bash installation failed: {e}")
+            print("Please try running this command manually in your terminal:")
+            print("  curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash")
+            sys.exit(1)
+    else:
+        print(f"❌ [UNSUPPORTED] OS '{current_os}' is not automatically supported.")
+        print("Please visit https://github.com/nousresearch/hermes-agent for manual installation instructions.")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    install()
+`;
+
       zip.file("README.md", readmeText);
+      zip.file("install_hermes.py", installHermesScriptText);
       zip.file("requirements.txt", requirementsText);
       zip.file("agents_config.json", configJson);
       zip.file("run_hermes.py", hermesScriptText);
@@ -1692,10 +1751,10 @@ if __name__ == "__main__":
     <main className={`min-h-screen ${isLightTheme ? "theme-light text-[#0F172A] bg-[#F1F5F9]" : "bg-[#06080D] text-[#E2E8F0]"} font-sans selection:bg-blue-500/30 overflow-x-hidden relative`} id="app_root">
       
       {/* GOOGLE LOGO COLOR GLOWS - REVOLVING & PULSING ACCENTS */}
-      <div className="absolute top-0 left-1/4 w-[550px] h-[550px] bg-[#4285F4]/8 rounded-full blur-[130px] pointer-events-none animate-pulse-glow" style={{ willChange: "transform, opacity" }} />
-      <div className="absolute top-1/4 right-5 w-[650px] h-[650px] bg-[#EA4335]/7 rounded-full blur-[150px] pointer-events-none animate-pulse-glow-alt" style={{ willChange: "transform, opacity" }} />
-      <div className="absolute bottom-1/4 left-5 w-[500px] h-[500px] bg-[#FBBC05]/5 rounded-full blur-[140px] pointer-events-none animate-pulse-glow" style={{ willChange: "transform, opacity" }} />
-      <div className="absolute bottom-0 right-1/4 w-[550px] h-[550px] bg-[#34A853]/6 rounded-full blur-[130px] pointer-events-none animate-pulse-glow-alt" style={{ willChange: "transform, opacity" }} />
+      <div className="fixed top-0 left-1/4 w-[550px] h-[550px] bg-[#4285F4]/8 rounded-full blur-[130px] pointer-events-none animate-pulse-glow" style={{ willChange: "transform, opacity" }} />
+      <div className="fixed top-1/4 right-5 w-[650px] h-[650px] bg-[#EA4335]/7 rounded-full blur-[150px] pointer-events-none animate-pulse-glow-alt" style={{ willChange: "transform, opacity" }} />
+      <div className="fixed bottom-1/4 left-5 w-[500px] h-[500px] bg-[#FBBC05]/5 rounded-full blur-[140px] pointer-events-none animate-pulse-glow" style={{ willChange: "transform, opacity" }} />
+      <div className="fixed bottom-0 right-1/4 w-[550px] h-[550px] bg-[#34A853]/6 rounded-full blur-[130px] pointer-events-none animate-pulse-glow-alt" style={{ willChange: "transform, opacity" }} />
 
       {/* SUPERIOR TEAM / BRAND HEADER */}
       <header className="border-b border-white/5 bg-[#090C12]/80 backdrop-blur-xl sticky top-0 z-50 px-4 md:px-8 py-3.5 shadow-md shadow-black/40 animate-fade-in" id="main_header">
@@ -1727,7 +1786,7 @@ if __name__ == "__main__":
                 </h1>
                 <span className="text-[8px] tracking-widest font-mono text-[#EA4335] uppercase bg-[#EA4335]/15 border border-[#EA4335]/30 px-1.5 py-0.5 rounded shrink-0 font-bold ml-2 relative top-[1px]">PRONOUNS: PJ</span>
               </div>
-              <p className="text-[9px] text-[#A0AEC0] font-mono tracking-wider uppercase">AstronautSHE.com Team Orchestration</p>
+              <p className="text-[9px] text-[#A0AEC0] font-mono tracking-wider uppercase">PodJobs.ai Team Orchestration</p>
             </div>
           </div>
           
@@ -3790,6 +3849,8 @@ if __name__ == "__main__":
           </motion.div>
         )}
 
+
+
       </div>
 
       {/* DETAILED FOOTER OF THE collective */}
@@ -3868,13 +3929,13 @@ if __name__ == "__main__":
       {/* NATIVE NOUS RESEARCH HERMES ONBOARDING WIZARD PORTAL */}
       <AnimatePresence>
         {isOnboardingOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#04060A]/95 backdrop-blur-md overflow-y-auto p-4" id="hermes_onboarding_portal">
+          <div className="fixed inset-0 z-50 flex justify-center bg-[#04060A]/95 backdrop-blur-md overflow-y-auto p-4 md:p-8" id="hermes_onboarding_portal">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               transition={{ duration: 0.3 }}
-              className="bg-[#0B0F19] border border-slate-800/80 rounded-3xl max-w-lg w-full p-6 md:p-8 mt-4 mb-4 shadow-2xl relative space-y-5 text-left"
+              className="bg-[#0B0F19] border border-slate-800/80 rounded-3xl max-w-lg w-full p-6 md:p-8 my-auto shadow-2xl relative space-y-5 text-left"
             >
               {/* Go back to page button (Arrow <) */}
               <button
@@ -4094,12 +4155,12 @@ if __name__ == "__main__":
       {/* NATIVE PRIVACY & TERMS INFORMATIVE DIALOG */}
       <AnimatePresence>
         {isTermsOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#030509]/90 backdrop-blur-sm p-4 overflow-y-auto" id="terms_dialog">
+          <div className="fixed inset-0 z-50 flex justify-center bg-[#030509]/90 backdrop-blur-sm p-4 overflow-y-auto" id="terms_dialog">
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
-              className="bg-[#0B0F19] border border-slate-800 rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl relative space-y-4 text-left"
+              className="bg-[#0B0F19] border border-slate-800 rounded-3xl max-w-lg w-full p-6 md:p-8 my-auto shadow-2xl relative space-y-4 text-left"
             >
               <button
                 onClick={() => setIsTermsOpen(false)}

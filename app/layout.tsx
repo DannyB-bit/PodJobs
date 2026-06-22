@@ -15,8 +15,29 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'PodJobs.ai // AstronautSHE (PJS)',
+  metadataBase: new URL('https://podjobs.vercel.app'),
+  title: 'PodJobs.ai // PodJobs the PJ',
   description: 'Explore the future of specialized, 12-agent AI Pod swarms under human orchestration.',
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon.png', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/favicon.png',
+  },
+  openGraph: {
+    title: 'PodJobs.ai // PodJobs the PJ',
+    description: 'Explore the future of specialized, 12-agent AI Pod swarms under human orchestration.',
+    images: [
+      {
+        url: '/favicon.png',
+        width: 800,
+        height: 850,
+        alt: 'PodJobs Logo',
+      },
+    ],
+  },
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {

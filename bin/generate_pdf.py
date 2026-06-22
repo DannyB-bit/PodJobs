@@ -144,6 +144,39 @@ def parse_markdown_to_flowables(filepath, styles):
             flowables.append(PageBreak())
             continue
 
+        # Custom QR Codes row layout
+        if stripped == '[QR_CODES_ROW]':
+            qr_w = 120
+            qr_h = 120
+            github_path = "assets/github_qr.png"
+            vercel_path = "assets/vercel_qr.png"
+            
+            if os.path.exists(github_path) and os.path.exists(vercel_path):
+                github_img = Image(github_path, width=qr_w, height=qr_h)
+                vercel_img = Image(vercel_path, width=qr_w, height=qr_h)
+                
+                github_img.hAlign = 'CENTER'
+                vercel_img.hAlign = 'CENTER'
+                
+                github_label = Paragraph("<font face='Helvetica-Bold' size='9' color='#0F172A'>GitHub: DannyB-bit/PodJobs</font>", styles['MetadataCentred'])
+                vercel_label = Paragraph("<font face='Helvetica-Bold' size='9' color='#0F172A'>Live Website: podjobs.vercel.app</font>", styles['MetadataCentred'])
+                
+                t_data = [
+                    [github_img, vercel_img],
+                    [github_label, vercel_label]
+                ]
+                t = Table(t_data, colWidths=[252, 252])
+                t.setStyle(TableStyle([
+                    ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                    ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+                    ('BOTTOMPADDING', (0,0), (-1,-1), 2),
+                    ('TOPPADDING', (0,0), (-1,-1), 2),
+                ]))
+                flowables.append(Spacer(1, 10))
+                flowables.append(t)
+                flowables.append(Spacer(1, 10))
+            continue
+
         # Custom DNA ASCII art handling
         if stripped == "🧬 H U M A N 🧬":
             ascii_art = (
