@@ -9,7 +9,7 @@
 [![Gemini 3.5 Flash](https://img.shields.io/badge/Powered%20By-Gemini%203.5%20Flash-blue?style=for-the-badge&logo=google)](https://ai.google.dev/)
 [![Model Context Protocol](https://img.shields.io/badge/Protocol-MCP-cyan?style=for-the-badge)](https://modelcontextprotocol.io/)
 
-📄 **[Download the Official Project PJ Whitepaper (PDF)](public/Whitepaper.pdf)** | 🌐 **[View Live Web App](https://podjobs.vercel.app)** | 🌌 **[On-Chain Walkthrough NFT](https://objkt.com/tokens/KT1L2gY2BUE2gcydLUXLzSAYwAvriYvZMBQ8/94)** | 🕵️‍♂️ **[View Agentic Audit & System Review](./AUDIT.md)**
+📄 **[Download the Official Project PJ Whitepaper (PDF)](public/Whitepaper.pdf)** | 🌐 **[View Live Web App](https://podjobs.vercel.app)** | 🌌 **[On-Chain Walkthrough NFT](https://objkt.com/tokens/KT1L2gY2BUE2gcydLUXLzSAYwAvriYvZMBQ8/94)** | 🏆 **[Kaggle Writeup](https://www.kaggle.com/competitions/vibecoding-agents-capstone-project/writeups/project-pj)** | 🕵️‍♂️ **[View Agentic Audit & System Review](./AUDIT.md)**
 
 PodJobs is a complete, production-ready **Multi-Agent Swarm Orchestration Platform** built for the **AI Agents: Intensive Vibe Coding Capstone Project**. 
 

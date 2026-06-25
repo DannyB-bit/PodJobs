@@ -6,6 +6,7 @@
 **Platform:** Google AI Studio, Google Antigravity, and Nous Research Hermes Agent  
 **Build Status:** Deployed & Live  
 **On-Chain Attestation Video NFT:** [Tezos Objkt Token #94](https://objkt.com/tokens/KT1L2gY2BUE2gcydLUXLzSAYwAvriYvZMBQ8/94)  
+**Kaggle Writeup Submission:** [PROJECT PJ Writeup](https://www.kaggle.com/competitions/vibecoding-agents-capstone-project/writeups/project-pj)  
 
 ---
 

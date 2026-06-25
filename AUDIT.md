@@ -8,6 +8,7 @@
 **Status:** **`PASSED - PRODUCTION LEVEL CERTIFIED`**  
 **Verification Token:** `antigravity_audit_seal:0208062c6c736a5f6ef03` (SHA-256 Verified Attestation)  
 **On-Chain Walkthrough NFT:** [Tezos Objkt Token #94](https://objkt.com/tokens/KT1L2gY2BUE2gcydLUXLzSAYwAvriYvZMBQ8/94) (CC-BY Certified Attestation)  
+**Kaggle Writeup Submission:** [PROJECT PJ Writeup](https://www.kaggle.com/competitions/vibecoding-agents-capstone-project/writeups/project-pj)  
 
 ---
 
