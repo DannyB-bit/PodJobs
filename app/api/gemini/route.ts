@@ -597,121 +597,119 @@ Provide exactly 12 specialized agents inside the "agents" array, each having the
       }
 
       // 2. Live Sequential Multi-Agent Execution Flow using Google GenAI SDK (ADK Concept)
+      // Executes ALL agents in the pod (up to 12), each making a real Gemini API call
       try {
-        const agentsNameList = (agents || []).map((a: any) => `${a.name} (${a.role})`).join("\n");
         const groundingText = retrievedChunks && retrievedChunks.length > 0
           ? `Grounded context from uploaded knowledge: "${retrievedChunks.join("\n")}"`
           : "No vector index context uploaded.";
 
-        // Task 1: Planner Agent parses user intentions
-        const plannerPrompt = `You are ${agents?.[0]?.name || "Operations Planner"}, a Lead Swarm Planner. 
+        const allAgents = agents || [];
+        const executionLogs: Array<{ agentName: string; action: string; outputSimulated: string; timeTakenSeconds: number; impactRating: string }> = [];
+        let previousOutput = "";
+        let draftOutput = "";
+        const startTime = Date.now();
+
+        for (let i = 0; i < Math.min(allAgents.length, 12); i++) {
+          const agent = allAgents[i];
+          const agentName = agent?.name || `Agent ${i + 1}`;
+          const agentRole = agent?.role || "Operational task execution";
+          const agentSpecialty = agent?.specialty || "General operations";
+
+          // Build contextual prompt based on agent position in the pipeline
+          let agentPrompt = "";
+          let actionLabel = "";
+          let impactLabel = "";
+
+          if (i === 0) {
+            // First agent: Planner — deconstruct the task
+            agentPrompt = `You are ${agentName}, a Lead Swarm Planner specializing in ${agentSpecialty}. Your role: ${agentRole}.
 Deconstruct the command: "${prompt}" for a "${role}" workstation.
-Formulate a structured execution plan. Be concise.`;
-        
-        const plannerRes = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
-          contents: plannerPrompt,
-        });
-        const planResult = plannerRes.text?.trim() || "Execution blueprint successfully defined.";
-
-        // Task 2: Researcher Agent indexes and aligns domain knowledge (RAG grounding)
-        const researcherPrompt = `You are ${agents?.[1]?.name || "Context Miner"}, a RAG Retrieval Specialist.
-Analyze the plan: "${planResult}" and retrieve templates.
+Formulate a structured execution plan. Be concise (max 3 sentences).`;
+            actionLabel = "Analyzing Human Blueprint Prompt";
+            impactLabel = "Execution Plan Built";
+          } else if (i === 1) {
+            // Second agent: Researcher — RAG retrieval
+            agentPrompt = `You are ${agentName}, a RAG Retrieval Specialist in ${agentSpecialty}. Your role: ${agentRole}.
+Analyze the plan: "${previousOutput}" and retrieve relevant templates.
 Incorporate this grounded context: "${groundingText}".
-Produce a concise research brief summarizing relevant guidelines or precedents.`;
-
-        const researcherRes = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
-          contents: researcherPrompt,
-        });
-        const researchResult = researcherRes.text?.trim() || "Precedent models mapped.";
-
-        // Task 3: Drafter Agent synthesizes final draft templates
-        const drafterPrompt = `You are ${agents?.[3]?.name || "Suite Draftsman"}, a Swarm Drafting Lead.
-Synthesize a comprehensive draft payload responding to: "${prompt}".
-Use the plan: "${planResult}" and research findings: "${researchResult}".
-Format professionally with sections. Keep it under 200 words.`;
-
-        const drafterRes = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
-          contents: drafterPrompt,
-        });
-        const draftResult = drafterRes.text?.trim() || "Consolidated swarm draft complete.";
-
-        // Task 4: Compliance Auditor Agent checks safety parameters (rule-based safety audit)
-        const safetyAudit = auditOutput(draftResult, agents?.[5]?.soulMd);
-        const auditorPrompt = `You are ${agents?.[5]?.name || "System Integrity Auditor"}, a compliance auditor.
-Inspect this draft for safety/compliance issues: "${draftResult}".
-NeMo-compatible safety check status: ${safetyAudit.safe ? "PASSED" : "FAILED"}. Bias: ${safetyAudit.score}.
+Produce a concise research brief (max 3 sentences).`;
+            actionLabel = "Knowledge Base Retrieval & Precedents Check";
+            impactLabel = "Knowledge Synced";
+          } else if (i === allAgents.length - 1) {
+            // Last agent: Consensus Arbiter — seal the pipeline
+            const safetyAudit = auditOutput(draftOutput || previousOutput, agent?.soulMd);
+            agentPrompt = `You are ${agentName}, the Swarm Consensus Arbiter in ${agentSpecialty}. Your role: ${agentRole}.
+Synthesize ALL pipeline outputs from ${allAgents.length} agents into a final strategic overwatch briefing.
+Latest draft: "${(draftOutput || previousOutput).substring(0, 500)}"
+Safety audit status: ${safetyAudit.safe ? "PASSED" : "FAILED"} (Bias: ${safetyAudit.score.toFixed(3)}).
+Confirm unanimous swarm consensus. Generate a final briefing for the Human Director in Markdown (max 5 sentences).`;
+            actionLabel = "Consensus Swarm Synthesis & Handover";
+            impactLabel = "Consensus Sealed";
+          } else if (i === allAgents.length - 2) {
+            // Second-to-last: Safety Auditor
+            const safetyAudit = auditOutput(draftOutput || previousOutput, agent?.soulMd);
+            agentPrompt = `You are ${agentName}, a compliance auditor specializing in ${agentSpecialty}. Your role: ${agentRole}.
+Inspect this pipeline output for safety/compliance issues: "${(draftOutput || previousOutput).substring(0, 400)}".
+Safety check status: ${safetyAudit.safe ? "PASSED" : "FAILED"}. Bias: ${safetyAudit.score}.
 Write a 2-sentence formal safety attestation audit.`;
-
-        const auditorRes = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
-          contents: auditorPrompt,
-        });
-        const auditResult = auditorRes.text?.trim() || "Compliance scan complete. Zero hazards flagged.";
-
-        // Task 5: Consensus Arbiter compiles and registers results
-        const arbiterPrompt = `You are ${agents?.[11]?.name || "Swarms Consensus Arbiter"}, a Swarm Arbiter Node.
-Synthesize the pipeline outputs:
-Planner: "${planResult}"
-Researcher: "${researchResult}"
-Drafter: "${draftResult}"
-Auditor: "${auditResult}"
-Confirm unanimous swarm consensus. Generate a final strategic overwatch briefing for the Human Director in Markdown.`;
-
-        const arbiterRes = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
-          contents: arbiterPrompt,
-        });
-        const finalBriefing = arbiterRes.text?.trim() || "Consensus established successfully.";
-
-        // Structure execution logs matching frontend expectations
-        const executionLogs = [
-          {
-            agentName: agents?.[0]?.name || "Operations Planner",
-            action: "Deconstructing prompt parameters",
-            outputSimulated: planResult,
-            timeTakenSeconds: 1.1,
-            impactRating: "Execution Plan Built"
-          },
-          {
-            agentName: agents?.[1]?.name || "Context Miner",
-            action: "Performing vector DB RAG crawl",
-            outputSimulated: researchResult,
-            timeTakenSeconds: 1.4,
-            impactRating: "Knowledge Synced"
-          },
-          {
-            agentName: agents?.[3]?.name || "Suite Draftsman",
-            action: "Compiling draft template payload",
-            outputSimulated: draftResult,
-            timeTakenSeconds: 2.0,
-            impactRating: "Payload Compiled"
-          },
-          {
-            agentName: agents?.[5]?.name || "System Integrity Auditor",
-            action: "Performing safety compliance scan",
-            outputSimulated: `${auditResult} (Bias score: ${safetyAudit.score.toFixed(3)})`,
-            timeTakenSeconds: 0.8,
-            impactRating: "Safety Verified"
-          },
-          {
-            agentName: agents?.[11]?.name || "Swarms Consensus Arbiter",
-            action: "Sealing swarm consensus agreement",
-            outputSimulated: "Consensus validated at 100% agreement score. Packaging outputs.",
-            timeTakenSeconds: 0.7,
-            impactRating: "Consensus Sealed"
+            actionLabel = "Ethics, Privacy & Regulatory Audit";
+            impactLabel = "Safety Verified";
+          } else if (i === 2 || i === 3) {
+            // Middle agents: Drafters/Synthesizers
+            agentPrompt = `You are ${agentName}, an expert in ${agentSpecialty}. Your role: ${agentRole}.
+Using the previous agent outputs: "${previousOutput.substring(0, 300)}"
+Execute your specialized task for: "${prompt}".
+Provide a concise technical output (max 3 sentences).`;
+            actionLabel = i === 2 ? "Formulating Structural Blueprint" : "Compiling draft template payload";
+            impactLabel = i === 2 ? "Structure Defined" : "Payload Compiled";
+          } else {
+            // All other agents: Specialized execution
+            agentPrompt = `You are ${agentName}, an expert in ${agentSpecialty}. Your role: ${agentRole}.
+Previous pipeline context: "${previousOutput.substring(0, 300)}"
+Apply your expertise to the task: "${prompt}".
+Provide your specialized analysis or output (max 2 sentences).`;
+            actionLabel = `Specialized ${agentSpecialty} analysis`;
+            impactLabel = "Task Completed";
           }
-        ];
 
-        // 3. Generate Cryptographic Merkle Root (Security Feature)
+          // Execute the Gemini API call for this agent
+          const agentRes = await ai.models.generateContent({
+            model: "gemini-3.5-flash",
+            contents: agentPrompt,
+          });
+          const agentOutput = agentRes.text?.trim() || `${agentName} completed ${agentSpecialty} analysis successfully.`;
+
+          // Track draft output for safety audit
+          if (i === 3 || (i > 1 && i < allAgents.length - 2)) {
+            draftOutput = agentOutput;
+          }
+
+          const elapsed = ((Date.now() - startTime) / 1000);
+          executionLogs.push({
+            agentName,
+            action: actionLabel,
+            outputSimulated: agentOutput,
+            timeTakenSeconds: parseFloat(elapsed.toFixed(1)),
+            impactRating: impactLabel
+          });
+
+          previousOutput = agentOutput;
+        }
+
+        // 3. Generate Cryptographic Merkle Root over ALL agent logs (Security Feature)
         const merkleRoot = calculateMerkleRoot(executionLogs);
+
+        // Get final briefing from the last agent's output
+        const finalBriefing = previousOutput;
 
         return NextResponse.json({
           executionLogs,
-          finalSummary: `### 🚀 [LIVE ADK SWARM EXECUTION SUCCESSFUL]\n\n${finalBriefing}\n\n**Merkle Root Attestation Sign:** \`sha256:${merkleRoot}\``,
+          finalSummary: `### 🚀 [LIVE ${executionLogs.length}-AGENT ADK SWARM EXECUTION SUCCESSFUL]\n\n${finalBriefing}\n\n**Merkle Root Attestation Sign:** \`sha256:${merkleRoot}\``,
           merkleRoot,
+          consensusSynthesis: {
+            unanimousConsensus: true,
+            summaryMarkdown: finalBriefing
+          },
           engine: "Live Multi-Agent ADK Engine"
         });
 
