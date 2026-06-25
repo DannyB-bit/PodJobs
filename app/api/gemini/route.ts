@@ -77,87 +77,87 @@ function generateFallbackPod(role: string, sector: string, onboardingUser?: any)
 
   if (isLegal) {
     agents = [
-      { id: "l1", name: "Arguments Blueprint Planner", role: "Maps legal arguments, deconstructs claims and plans brief flow", specialty: "Workflow planning", productivityBoost: "10x faster filing flow", icon: "Compass", status: "idle" },
-      { id: "l2", name: "Precedent Case Searcher", role: "Indexes digital court databases and retrieves relevant historical verdicts", specialty: "Case retrieval", productivityBoost: "15x query velocity", icon: "Search", status: "idle" },
-      { id: "l3", name: "Constitutional Dossier Harvester", role: "Extracts and classifies legal discovery metadata from massive pdf logs", specialty: "Context formatting", productivityBoost: "12x cleaner context", icon: "Database", status: "idle" },
-      { id: "l4", name: "Pleadings Master Draftsman", role: "Instantly generates compliant trial briefs, pleadings, and motions templates", specialty: "Draft synthesis", productivityBoost: "8x drafting turnaround", icon: "FileText", status: "idle" },
-      { id: "l5", name: "Statutory Citation Auditor", role: "Validates all case citations, statutory references, and code formatting rules", specialty: "Precision polishing", productivityBoost: "0% citation errors", icon: "PenTool", status: "idle" },
-      { id: "l6", name: "Liability & Risk Assessor", role: "Inspects drafted letters for accidental exposure, bias, or liability leaks", specialty: "Risk compliance", productivityBoost: "Zero liability leaks", icon: "Shield", status: "idle" },
-      { id: "l7", name: "Jurisdiction Adapter Bot", role: "Formatting briefs to meet local, state, and appellate court mandates", specialty: "Localization", productivityBoost: "Instant formatting specs", icon: "Globe", status: "idle" },
-      { id: "l8", name: "Court Fee & Ledger Comptroller", role: "Computes trust accounts, court filing fees, and asset allocation indexes", specialty: "Financial math", productivityBoost: "Clean billing logs", icon: "DollarSign", status: "idle" },
-      { id: "l9", name: "Adversarial Stress Tester", role: "Simulates opposing counsel objections and tests weaknesses in argument logic", specialty: "Stressor simulation", productivityBoost: "30% more robust briefs", icon: "Zap", status: "idle" },
-      { id: "l10", name: "Consolidated Case Summarizer", role: "Merges deep research and trial filings into an executive client briefing", specialty: "Summary briefings", productivityBoost: "Instant brief drafts", icon: "Activity", status: "idle" },
-      { id: "l11", name: "Ethics Committee Validator", role: "Verifies state bar directives, professional conduct rules and compliance", specialty: "Ethics alignment", productivityBoost: "100% ethics pass rate", icon: "Scale", status: "idle" },
-      { id: "l12", name: "Consensus Verdict Arbiter", role: "Polls other agents via a structured verification matrix to pick the safest legal strategy", specialty: "Consensus voting", productivityBoost: "Unified battleplan", icon: "Cpu", status: "idle" }
+      { id: "l1", name: `${nameClean} Arguments Planner`, role: "Maps legal arguments, deconstructs claims and plans brief flow", specialty: "Workflow planning", productivityBoost: "10x faster filing flow", icon: "Compass", status: "idle" },
+      { id: "l2", name: `${nameClean} Precedent Case Searcher`, role: "Indexes digital court databases and retrieves relevant historical verdicts", specialty: "Case retrieval", productivityBoost: "15x query velocity", icon: "Search", status: "idle" },
+      { id: "l3", name: `${nameClean} Dossier Harvester`, role: "Extracts and classifies legal discovery metadata from massive pdf logs", specialty: "Context formatting", productivityBoost: "12x cleaner context", icon: "Database", status: "idle" },
+      { id: "l4", name: `${nameClean} Pleadings Draftsman`, role: "Instantly generates compliant trial briefs, pleadings, and motions templates", specialty: "Draft synthesis", productivityBoost: "8x drafting turnaround", icon: "FileText", status: "idle" },
+      { id: "l5", name: `${nameClean} Citation Auditor`, role: "Validates all case citations, statutory references, and code formatting rules", specialty: "Precision polishing", productivityBoost: "0% citation errors", icon: "PenTool", status: "idle" },
+      { id: "l6", name: `${nameClean} Risk Assessor`, role: "Inspects drafted letters for accidental exposure, bias, or liability leaks", specialty: "Risk compliance", productivityBoost: "Zero liability leaks", icon: "Shield", status: "idle" },
+      { id: "l7", name: `${nameClean} Jurisdiction Adapter`, role: "Formatting briefs to meet local, state, and appellate court mandates", specialty: "Localization", productivityBoost: "Instant formatting specs", icon: "Globe", status: "idle" },
+      { id: "l8", name: `${nameClean} Fee Comptroller`, role: "Computes trust accounts, court filing fees, and asset allocation indexes", specialty: "Financial math", productivityBoost: "Clean billing logs", icon: "DollarSign", status: "idle" },
+      { id: "l9", name: `${nameClean} Stress Tester`, role: "Simulates opposing counsel objections and tests weaknesses in argument logic", specialty: "Stressor simulation", productivityBoost: "30% more robust briefs", icon: "Zap", status: "idle" },
+      { id: "l10", name: `${nameClean} Case Summarizer`, role: "Merges deep research and trial filings into an executive client briefing", specialty: "Summary briefings", productivityBoost: "Instant brief drafts", icon: "Activity", status: "idle" },
+      { id: "l11", name: `${nameClean} Ethics Validator`, role: "Verifies state bar directives, professional conduct rules and compliance", specialty: "Ethics alignment", productivityBoost: "100% ethics pass rate", icon: "Scale", status: "idle" },
+      { id: "l12", name: `${nameClean} Verdict Arbiter`, role: "Polls other agents via a structured verification matrix to pick the safest legal strategy", specialty: "Consensus voting", productivityBoost: "Unified battleplan", icon: "Cpu", status: "idle" }
     ];
     workflowSteps = [
-      { title: "Arguments Blueprinting", executor: "Arguments Blueprint Planner", description: "Deconstructs filings into active logic branches." },
-      { title: "Dynamic Case Search", executor: "Precedent Case Searcher", description: "Crawls civil precedents for relevant verdicts." },
-      { title: "Citation & Risk Verification", executor: "Statutory Citation Auditor", description: "Polishes citations and isolates liability leaks." },
-      { title: "Mock Adversarial Review", executor: "Consensus Verdict Arbiter", description: "Simulates trial hurdles & signs off custom legal brief." }
+      { title: "Arguments Blueprinting", executor: `${nameClean} Arguments Planner`, description: "Deconstructs filings into active logic branches." },
+      { title: "Dynamic Case Search", executor: `${nameClean} Precedent Case Searcher`, description: "Crawls civil precedents for relevant verdicts." },
+      { title: "Citation & Risk Verification", executor: `${nameClean} Citation Auditor`, description: "Polishes citations and isolates liability leaks." },
+      { title: "Mock Adversarial Review", executor: `${nameClean} Verdict Arbiter`, description: "Simulates trial hurdles & signs off custom legal brief." }
     ];
   } else if (isMedical) {
     agents = [
-      { id: "m1", name: "Diagnostic Tree Planner", role: "Assesses complex symptoms, deconstructing them into pathology targets", specialty: "Triage planning", productivityBoost: "8x intake throughput", icon: "Compass", status: "idle" },
-      { id: "m2", name: "Pathological Scholar", role: "Queries clinical trial journals, medical precedents and biotech logs", specialty: "Literature query", productivityBoost: "20x search rate", icon: "Search", status: "idle" },
-      { id: "m3", name: "Physiological Data Harvester", role: "Aggregates and formats patient vital telemetry logs and device feeds", specialty: "Context parsing", productivityBoost: "14x cleaner records", icon: "Database", status: "idle" },
-      { id: "m4", name: "Clinical Case Formulator", role: "Compiles first-draft clinical case summaries, treatment models, and reports", specialty: "Draft synthesis", productivityBoost: "10x case output", icon: "FileText", status: "idle" },
-      { id: "m5", name: "Calibration & Dose polisher", role: "Verifies physiological measurements, dosimetry, and compound math parameters", specialty: "Dosage accuracy", productivityBoost: "Zero math anomalies", icon: "PenTool", status: "idle" },
-      { id: "m6", name: "FDA & HIPAA Compliance Auditor", role: "Secures diagnostic drafts against private information leakage and medical bar codes", specialty: "Privacy guard", productivityBoost: "100% privacy compliance", icon: "Shield", status: "idle" },
-      { id: "m7", name: "Patient-Comprehension Adaptor", role: "Translates complex clinical jargon into elegant, warm, patient-friendly guidance", specialty: "Linguistic reach", productivityBoost: "Perfect customer scores", icon: "Globe", status: "idle" },
-      { id: "m8", name: "Clinical Allocation Comptroller", role: "Tracks resource costs, pharmaceutical billing bounds, and licensing quotas", specialty: "Resource audit", productivityBoost: "Real-time cost ledger", icon: "DollarSign", status: "idle" },
-      { id: "m9", name: "Pathology Drift Predictor", role: "Stress tests treatment models against sudden physiological or medical anomalies", specialty: "Drift forecasting", productivityBoost: "25% safer medical paths", icon: "Zap", status: "idle" },
-      { id: "m10", name: "Consolidated Health Reporter", role: "Synchronizes genetic, vital, and literature logs into a single summary page", specialty: "Summary briefs", productivityBoost: "Instant briefing cards", icon: "Activity", status: "idle" },
-      { id: "m11", name: "Medical Ethics Inspector", role: "Aligns therapeutic suggestions with contemporary healthcare ethical rules", specialty: "Ethics review", productivityBoost: "Secure practice bounds", icon: "Scale", status: "idle" },
-      { id: "m12", name: "Consensus Medicine Director", role: "Drives final triage agreement via a structured clinical verification model", specialty: "Consensus polling", productivityBoost: "Unified treatment plan", icon: "Cpu", status: "idle" }
+      { id: "m1", name: `${nameClean} Diagnostic Tree Planner`, role: "Assesses complex symptoms, deconstructing them into pathology targets", specialty: "Triage planning", productivityBoost: "8x intake throughput", icon: "Compass", status: "idle" },
+      { id: "m2", name: `${nameClean} Pathological Scholar`, role: "Queries clinical trial journals, medical precedents and biotech logs", specialty: "Literature query", productivityBoost: "20x search rate", icon: "Search", status: "idle" },
+      { id: "m3", name: `${nameClean} Data Harvester`, role: "Aggregates and formats patient vital telemetry logs and device feeds", specialty: "Context parsing", productivityBoost: "14x cleaner records", icon: "Database", status: "idle" },
+      { id: "m4", name: `${nameClean} Case Formulator`, role: "Compiles first-draft clinical case summaries, treatment models, and reports", specialty: "Draft synthesis", productivityBoost: "10x case output", icon: "FileText", status: "idle" },
+      { id: "m5", name: `${nameClean} Calibration Dose Polisher`, role: "Verifies physiological measurements, dosimetry, and compound math parameters", specialty: "Dosage accuracy", productivityBoost: "Zero math anomalies", icon: "PenTool", status: "idle" },
+      { id: "m6", name: `${nameClean} Compliance Auditor`, role: "Secures diagnostic drafts against private information leakage and medical bar codes", specialty: "Privacy guard", productivityBoost: "100% privacy compliance", icon: "Shield", status: "idle" },
+      { id: "m7", name: `${nameClean} Patient Adaptor`, role: "Translates complex clinical jargon into elegant, warm, patient-friendly guidance", specialty: "Linguistic reach", productivityBoost: "Perfect customer scores", icon: "Globe", status: "idle" },
+      { id: "m8", name: `${nameClean} Allocation Comptroller`, role: "Tracks resource costs, pharmaceutical billing bounds, and licensing quotas", specialty: "Resource audit", productivityBoost: "Real-time cost ledger", icon: "DollarSign", status: "idle" },
+      { id: "m9", name: `${nameClean} Drift Predictor`, role: "Stress tests treatment models against sudden physiological or medical anomalies", specialty: "Drift forecasting", productivityBoost: "25% safer medical paths", icon: "Zap", status: "idle" },
+      { id: "m10", name: `${nameClean} Health Reporter`, role: "Synchronizes genetic, vital, and literature logs into a single summary page", specialty: "Summary briefs", productivityBoost: "Instant briefing cards", icon: "Activity", status: "idle" },
+      { id: "m11", name: `${nameClean} Ethics Inspector`, role: "Aligns therapeutic suggestions with contemporary healthcare ethical rules", specialty: "Ethics review", productivityBoost: "Secure practice bounds", icon: "Scale", status: "idle" },
+      { id: "m12", name: `${nameClean} Medicine Director`, role: "Drives final triage agreement via a structured clinical verification model", specialty: "Consensus polling", productivityBoost: "Unified treatment plan", icon: "Cpu", status: "idle" }
     ];
     workflowSteps = [
-      { title: "Pathway Mapping", executor: "Diagnostic Tree Planner", description: "Decomposes inputs into vital paths." },
-      { title: "Precedent Research", executor: "Pathological Scholar", description: "Queries global databases for treatment matches." },
-      { title: "Dosage & Compliance Polishing", executor: "Calibration & Dose polisher", description: "Performs safety audits on formulas." },
-      { title: "Unified Diagnostic Seal", executor: "Consensus Medicine Director", description: "Verifies treatment and outputs executive health file." }
+      { title: "Pathway Mapping", executor: `${nameClean} Diagnostic Tree Planner`, description: "Decomposes inputs into vital paths." },
+      { title: "Precedent Research", executor: `${nameClean} Pathological Scholar`, description: "Queries global databases for treatment matches." },
+      { title: "Dosage & Compliance Polishing", executor: `${nameClean} Calibration Dose Polisher`, description: "Performs safety audits on formulas." },
+      { title: "Unified Diagnostic Seal", executor: `${nameClean} Medicine Director`, description: "Verifies treatment and outputs executive health file." }
     ];
   } else if (isCreative) {
     agents = [
-      { id: "c1", name: "Moodboard Motif Planner", role: "Explodes creative inputs into distinct aesthetic assets and themes", specialty: "Campaign blueprinting", productivityBoost: "10x faster iteration", icon: "Compass", status: "idle" },
-      { id: "c2", name: "Trend-Pulse Scholar", role: "Combs online archives, aesthetic platforms and current industrial trends", specialty: "Trend query", productivityBoost: "18x search efficiency", icon: "Search", status: "idle" },
-      { id: "c3", name: "Media Assets Harvester", role: "Indexes and scrapes color charts, typography metrics and image layout blocks", specialty: "Asset formatting", productivityBoost: "12x cleaner palettes", icon: "Database", status: "idle" },
-      { id: "c4", name: "Aesthetic Wireframe Synthesizer", role: "Stitches drafts, concept sketches, copywriting copy, or UX wireframes", specialty: "Visual drafting", productivityBoost: "15x wireframing speed", icon: "FileText", status: "idle" },
-      { id: "c5", name: "Contrast & Accent Polisher", role: "Fine-tunes design balance, layout typography, and high-frequency margins", specialty: "Aesthetic polish", productivityBoost: "Zero layout friction", icon: "PenTool", status: "idle" },
-      { id: "c6", name: "IP & Integrity Guardian", role: "Checks draft assets for copyright conflicts and trademark anomalies", specialty: "Brand compliance", productivityBoost: "Zero asset warnings", icon: "Shield", status: "idle" },
-      { id: "c7", name: "Multicultural Voice Adapter", role: "Localizes visual and textual tones to fit 45 target demographic areas", specialty: "Culture adapter", productivityBoost: "Universal brand reach", icon: "Globe", status: "idle" },
-      { id: "c8", name: "Production Budget Comptroller", role: "Estimates material, licensing, server compute, or licensing asset cost margins", specialty: "SLA math", productivityBoost: "Real-time cost projection", icon: "DollarSign", status: "idle" },
-      { id: "c9", name: "User Fatigue Predictor", role: "Stresses design layouts against aesthetic saturation and attention-decay models", specialty: "Fatigue testing", productivityBoost: "35% higher attention yield", icon: "Zap", status: "idle" },
-      { id: "c10", name: "Presentation Deck Reporter", role: "Gathers creative concept milestones into a structured pitch brief", specialty: "Brief summarization", productivityBoost: "Instant campaign pitch", icon: "Activity", status: "idle" },
-      { id: "c11", name: "Visual Accessibility Inspector", role: "Verifies design contrast ratios against modern guidelines", specialty: "WCAG contrast audit", productivityBoost: "Perfect readability level", icon: "Scale", status: "idle" },
-      { id: "c12", name: "Consensus Style Director", role: "Orchestrates consensus vote to choose the single most persuasive concept", specialty: "Style consensus", productivityBoost: "Unified brand seal", icon: "Cpu", status: "idle" }
+      { id: "c1", name: `${nameClean} Motif Planner`, role: "Explodes creative inputs into distinct aesthetic assets and themes", specialty: "Campaign blueprinting", productivityBoost: "10x faster iteration", icon: "Compass", status: "idle" },
+      { id: "c2", name: `${nameClean} Trend Scholar`, role: "Combs online archives, aesthetic platforms and current industrial trends", specialty: "Trend query", productivityBoost: "18x search efficiency", icon: "Search", status: "idle" },
+      { id: "c3", name: `${nameClean} Assets Harvester`, role: "Indexes and scrapes color charts, typography metrics and image layout blocks", specialty: "Asset formatting", productivityBoost: "12x cleaner palettes", icon: "Database", status: "idle" },
+      { id: "c4", name: `${nameClean} Wireframe Synthesizer`, role: "Stitches drafts, concept sketches, copywriting copy, or UX wireframes", specialty: "Visual drafting", productivityBoost: "15x wireframing speed", icon: "FileText", status: "idle" },
+      { id: "c5", name: `${nameClean} Accent Polisher`, role: "Fine-tunes design balance, layout typography, and high-frequency margins", specialty: "Aesthetic polish", productivityBoost: "Zero layout friction", icon: "PenTool", status: "idle" },
+      { id: "c6", name: `${nameClean} Integrity Guardian`, role: "Checks draft assets for copyright conflicts and trademark anomalies", specialty: "Brand compliance", productivityBoost: "Zero asset warnings", icon: "Shield", status: "idle" },
+      { id: "c7", name: `${nameClean} Voice Adapter`, role: "Localizes visual and textual tones to fit 45 target demographic areas", specialty: "Culture adapter", productivityBoost: "Universal brand reach", icon: "Globe", status: "idle" },
+      { id: "c8", name: `${nameClean} Budget Comptroller`, role: "Estimates material, licensing, server compute, or licensing asset cost margins", specialty: "SLA math", productivityBoost: "Real-time cost projection", icon: "DollarSign", status: "idle" },
+      { id: "c9", name: `${nameClean} Fatigue Predictor`, role: "Stresses design layouts against aesthetic saturation and attention-decay models", specialty: "Fatigue testing", productivityBoost: "35% higher attention yield", icon: "Zap", status: "idle" },
+      { id: "c10", name: `${nameClean} Presentation Reporter`, role: "Gathers creative concept milestones into a structured pitch brief", specialty: "Brief summarization", productivityBoost: "Instant campaign pitch", icon: "Activity", status: "idle" },
+      { id: "c11", name: `${nameClean} Accessibility Inspector`, role: "Verifies design contrast ratios against modern guidelines", specialty: "WCAG contrast audit", productivityBoost: "Perfect readability level", icon: "Scale", status: "idle" },
+      { id: "c12", name: `${nameClean} Style Director`, role: "Orchestrates consensus vote to choose the single most persuasive concept", specialty: "Style consensus", productivityBoost: "Unified brand seal", icon: "Cpu", status: "idle" }
     ];
     workflowSteps = [
-      { title: "Motif Blueprinting", executor: "Moodboard Motif Planner", description: "Decomposes human parameters into visual vectors." },
-      { title: "Trend Alignment query", executor: "Trend-Pulse Scholar", description: "Extracts historic precedents for target audience." },
-      { title: "Aesthetic Layout Polishing", executor: "Contrast & Accent Polisher", description: "Cleans color contrast, typography and page alignment." },
-      { title: "Unified Campaign Release", executor: "Consensus Style Director", description: "Conducts brand consensus and seals consolidated release brief." }
+      { title: "Motif Blueprinting", executor: `${nameClean} Motif Planner`, description: "Decomposes human parameters into visual vectors." },
+      { title: "Trend Alignment query", executor: `${nameClean} Trend Scholar`, description: "Extracts historic precedents for target audience." },
+      { title: "Aesthetic Layout Polishing", executor: `${nameClean} Accent Polisher`, description: "Cleans color contrast, typography and page alignment." },
+      { title: "Unified Campaign Release", executor: `${nameClean} Style Director`, description: "Conducts brand consensus and seals consolidated release brief." }
     ];
   } else if (isFinance) {
     agents = [
-      { id: "f1", name: "Asset Exposure Planner", role: "Deconstructs complex trade directives into specific asset risk branches", specialty: "Investment mapping", productivityBoost: "9x faster portfolio starts", icon: "Compass", status: "idle" },
-      { id: "f2", name: "Macro Market Scholar", role: "Crawls SEC records, interest metrics, price logs and historic indexes", specialty: "Market retrieval", productivityBoost: "16x query velocity", icon: "Search", status: "idle" },
-      { id: "f3", name: "Ticker Metadata Harvester", role: "Assembles financial spreadsheets, parsing raw csv/json transaction streams", specialty: "Context indexation", productivityBoost: "11x cleaner ledger data", icon: "Database", status: "idle" },
-      { id: "f4", name: "Valuation Matrix Compiler", role: "Synthesizes first-draft valuation equations, sheets, and audit reports", specialty: "Draft synthesis", productivityBoost: "14x sheet generation", icon: "FileText", status: "idle" },
-      { id: "f5", name: "Yield Precision Comptroller", role: "Fine-tunes decimal fractions, interest ratios, and balance sheet formulas", specialty: "Fractions precision", productivityBoost: "Zero float arithmetic failures", icon: "PenTool", status: "idle" },
-      { id: "f6", name: "Regulatory Compliance Auditor", role: "Cross-checks portfolios with SEC, KYC, or anti-money laundering codes", specialty: "Regulatory compliance", productivityBoost: "100% regulatory clear", icon: "Shield", status: "idle" },
-      { id: "f7", name: "Tax System Localizer", role: "Converts report metrics to fit domestic, European, or pan-Asian tax standards", specialty: "Tax localization", productivityBoost: "Instant global compliance", icon: "Globe", status: "idle" },
-      { id: "f8", name: "Stripe/Billing API Comptroller", role: "Measures actual execution fees, gas, gas limits, and clearing costs", specialty: "Gas & cost management", productivityBoost: "Error-free billing checks", icon: "DollarSign", status: "idle" },
-      { id: "f9", name: "Liquidity Stress Modeler", role: "Simulates black-swan interest moves, retail runs and algorithmic liquidations", specialty: "Black-swan testing", productivityBoost: "30% more resilient ledger", icon: "Zap", status: "idle" },
-      { id: "f10", name: "Consolidated Portfolio Reporter", role: "Fuses active trades, yields, and compliance status into index briefing files", specialty: "Digest compiling", productivityBoost: "Instant ledger pitch", icon: "Activity", status: "idle" },
-      { id: "f11", name: "Fiducial Integrity Guard", role: "Assesses investment paths against corporate ethical bar guidelines", specialty: "Conflict checking", productivityBoost: "Clear fiducial reports", icon: "Scale", status: "idle" },
-      { id: "f12", name: "Consensus Trading Director", role: "Drives target execution agreements using a structured verification model", specialty: "Trading consensus", productivityBoost: "Unified risk signoff", icon: "Cpu", status: "idle" }
+      { id: "f1", name: `${nameClean} Exposure Planner`, role: "Deconstructs complex trade directives into specific asset risk branches", specialty: "Investment mapping", productivityBoost: "9x faster portfolio starts", icon: "Compass", status: "idle" },
+      { id: "f2", name: `${nameClean} Market Scholar`, role: "Crawls SEC records, interest metrics, price logs and historic indexes", specialty: "Market retrieval", productivityBoost: "16x query velocity", icon: "Search", status: "idle" },
+      { id: "f3", name: `${nameClean} Ticker Harvester`, role: "Assembles financial spreadsheets, parsing raw csv/json transaction streams", specialty: "Context indexation", productivityBoost: "11x cleaner ledger data", icon: "Database", status: "idle" },
+      { id: "f4", name: `${nameClean} Valuation Compiler`, role: "Synthesizes first-draft valuation equations, sheets, and audit reports", specialty: "Draft synthesis", productivityBoost: "14x sheet generation", icon: "FileText", status: "idle" },
+      { id: "f5", name: `${nameClean} Yield Comptroller`, role: "Fine-tunes decimal fractions, interest ratios, and balance sheet formulas", specialty: "Fractions precision", productivityBoost: "Zero float arithmetic failures", icon: "PenTool", status: "idle" },
+      { id: "f6", name: `${nameClean} Compliance Auditor`, role: "Cross-checks portfolios with SEC, KYC, or anti-money laundering codes", specialty: "Regulatory compliance", productivityBoost: "100% regulatory clear", icon: "Shield", status: "idle" },
+      { id: "f7", name: `${nameClean} Tax Localizer`, role: "Converts report metrics to fit domestic, European, or pan-Asian tax standards", specialty: "Tax localization", productivityBoost: "Instant global compliance", icon: "Globe", status: "idle" },
+      { id: "f8", name: `${nameClean} Billing Comptroller`, role: "Measures actual execution fees, gas, gas limits, and clearing costs", specialty: "Gas & cost management", productivityBoost: "Error-free billing checks", icon: "DollarSign", status: "idle" },
+      { id: "f9", name: `${nameClean} Stress Modeler`, role: "Simulates black-swan interest moves, retail runs and algorithmic liquidations", specialty: "Black-swan testing", productivityBoost: "30% more resilient ledger", icon: "Zap", status: "idle" },
+      { id: "f10", name: `${nameClean} Portfolio Reporter`, role: "Fuses active trades, yields, and compliance status into index briefing files", specialty: "Digest compiling", productivityBoost: "Instant ledger pitch", icon: "Activity", status: "idle" },
+      { id: "f11", name: `${nameClean} Integrity Guard`, role: "Assesses investment paths against corporate ethical bar guidelines", specialty: "Conflict checking", productivityBoost: "Clear fiducial reports", icon: "Scale", status: "idle" },
+      { id: "f12", name: `${nameClean} Trading Director`, role: "Drives target execution agreements using a structured verification model", specialty: "Trading consensus", productivityBoost: "Unified risk signoff", icon: "Cpu", status: "idle" }
     ];
     workflowSteps = [
-      { title: "Risk Tree Mapping", executor: "Asset Exposure Planner", description: "Decomposes requests into specific investment branches." },
-      { title: "Macro Precedent index", executor: "Macro Market Scholar", description: "Extracts historic filings for target securities." },
-      { title: "Ledger Audit & Polishing", executor: "Yield Precision Comptroller", description: "Ensures spreadsheet math conforms to active regulations." },
-      { title: "Consensus Investment Seal", executor: "Consensus Trading Director", description: "Performs asset consensus and seals consolidated risk brief." }
+      { title: "Risk Tree Mapping", executor: `${nameClean} Exposure Planner`, description: "Decomposes requests into specific investment branches." },
+      { title: "Macro Precedent index", executor: `${nameClean} Market Scholar`, description: "Extracts historic filings for target securities." },
+      { title: "Ledger Audit & Polishing", executor: `${nameClean} Yield Comptroller`, description: "Ensures spreadsheet math conforms to active regulations." },
+      { title: "Consensus Investment Seal", executor: `${nameClean} Trading Director`, description: "Performs asset consensus and seals consolidated risk brief." }
     ];
   } else {
     // Highly tailored general fallback matching the exact name dynamically!
