@@ -406,6 +406,7 @@ export default function Page() {
   const [customSimRunning, setCustomSimRunning] = useState<boolean>(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [showRateLimitWarning, setShowRateLimitWarning] = useState<boolean>(false);
+  const [swarmTopology, setSwarmTopology] = useState<"sequential" | "mesh">("sequential");
 
   // Dynamic Agent Handshake and Configuration terminal modal/drawer states
   const [selectedAgent, setSelectedAgent] = useState<any | null>(null);
@@ -1324,6 +1325,7 @@ Your browser is ready to query your private Local LLM, but we couldn't establish
             role: customRole,
             agents: customPodData.agents,
             retrievedChunks: matchedChunks,
+            topology: swarmTopology,
             ...(brainProvider === "custom-gemini" && { customApiKey })
           })
         });
@@ -1481,6 +1483,7 @@ import os
 import sys
 import time
 import hashlib
+import asyncio
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -1643,6 +1646,116 @@ def ensure_api_keys():
         console.print("\\n[yellow]Continuing in simulation/offline mode.[/yellow]\\n")
 
 # ---------------------------------------------------------------------------
+# Parallel Mesh Network Topology Classes and Functions
+# ---------------------------------------------------------------------------
+class MeshMessageBroker:
+    def __init__(self, console_obj):
+        self.message_board = []
+        self.queues = {}
+        self.console = console_obj
+        self.active_agents = set()
+
+    def register_agent(self, agent_name):
+        self.queues[agent_name] = asyncio.Queue()
+        self.active_agents.add(agent_name)
+
+    async def send_message(self, sender, recipient, content):
+        msg = {"sender": sender, "content": content}
+        self.message_board.append({
+            "sender": sender,
+            "recipient": recipient,
+            "content": content,
+            "timestamp": time.time()
+        })
+        
+        if recipient == "All":
+            self.console.print(f"  [bold magenta]📣 Broadcast from {sender}:[/bold magenta] [italic]{content[:120]}...[/italic]")
+            for name, q in self.queues.items():
+                if name != sender:
+                    await q.put(msg)
+        else:
+            self.console.print(f"  [bold cyan]✉ {sender} ➔ {recipient}:[/bold cyan] [italic]{content[:120]}...[/italic]")
+            if recipient in self.queues:
+                await self.queues[recipient].put(msg)
+
+
+async def run_mesh_agent_worker(agent_name, agent_cfg, model, broker, user_prompt, max_turns=3):
+    broker.register_agent(agent_name)
+    agent_specialty = agent_cfg.get("specialty", "General")
+    agent_role = agent_cfg.get("role", "Swarm agent")
+    
+    try:
+        system_context = (
+            f"You are {agent_name}, an expert AI agent specializing in {agent_specialty}. "
+            f"Your role: {agent_role}. "
+            f"You operate concurrently inside an Asynchronous Mesh Swarm. "
+            f"Be concise, technical, and address fellow agents directly. Max 2 sentences."
+        )
+        hermes_agent = AIAgent(model=model, quiet_mode=True)
+    except Exception as e:
+        class MockAgent:
+            def chat(self, p):
+                return f"[Mesh Analysis] {agent_name} verified specialty constraints for: '{p[-80:]}'."
+        hermes_agent = MockAgent()
+
+    # Planner starts the discussion
+    if agent_specialty == "Workflow planning":
+        await asyncio.sleep(0.5)
+        intro = f"Swarm initiated. Our objective is: '{user_prompt}'. I propose we compile the codebase specifications and execute security scans. Swarms Consensus Arbiter, please verify compliance when drafts are ready."
+        await broker.send_message(agent_name, "All", intro)
+    
+    turns = 0
+    while turns < max_turns:
+        try:
+            msg = await asyncio.wait_for(broker.queues[agent_name].get(), timeout=4.0)
+            sender = msg["sender"]
+            content = msg["content"]
+            
+            prompt = (
+                f"[System: {system_context}]\\n\\n"
+                f"Global Swarm Goal: '{user_prompt}'\\n"
+                f"Incoming Message from {sender}: '{content}'\\n\\n"
+                f"Respond to this message with your specific domain expert input. If you are the Consensus Arbiter and all nodes look complete, print 'Consensus Sealed'. Keep it very short."
+            )
+            
+            try:
+                response = hermes_agent.chat(prompt)
+                response_str = str(response).strip() if response else f"{agent_name} validated task."
+            except Exception as e:
+                response_str = f"[Simulated Output] {agent_name} checked state for {sender}'s brief."
+
+            turns += 1
+            
+            if agent_cfg.get("specialty") == "Consensus polling":
+                if "consensus sealed" in response_str.lower() or turns == max_turns:
+                    await broker.send_message(agent_name, "All", f"Consensus Sealed: Swarm objective achieved. Attestation active.")
+                    break
+                else:
+                    await broker.send_message(agent_name, "All", f"Consensus Update: Reviewing message from {sender}.")
+            else:
+                await broker.send_message(agent_name, "Swarms Consensus Arbiter", response_str)
+                
+        except asyncio.TimeoutError:
+            if agent_cfg.get("specialty") == "Consensus polling":
+                await broker.send_message(agent_name, "All", "Consensus Sealed: Swarm finalized by timeout attestation.")
+                break
+            else:
+                await broker.send_message(agent_name, "Swarms Consensus Arbiter", f"{agent_name} reporting specialty checks complete.")
+                break
+
+
+async def run_mesh_swarm_async(agents, model, user_prompt):
+    broker = MeshMessageBroker(console)
+    tasks = []
+    
+    for agent_cfg in agents:
+        agent_name = agent_cfg.get("name", "Specialist Node")
+        tasks.append(run_mesh_agent_worker(agent_name, agent_cfg, model, broker, user_prompt))
+        
+    await asyncio.gather(*tasks)
+    return broker.message_board
+
+# ---------------------------------------------------------------------------
 # Main Swarm Orchestrator
 # ---------------------------------------------------------------------------
 def run_hermes_swarm():
@@ -1695,117 +1808,145 @@ def run_hermes_swarm():
         table.add_row(str(i + 1), a.get("name", "N/A"), a.get("specialty", "N/A"), a.get("pronouns", "They/Them"))
     console.print(table)
 
-    # Execute each agent through Hermes
+    # Determine topology and run swarm
     execution_logs = []
-    previous_output = ""
+    is_mesh = False
+    
+    # Get topology choice
+    console.print("\\n[bold white]Choose Swarm Topology:[/bold white]")
+    console.print("  1. [bold cyan]Sequential Cascade[/bold cyan] (Standard linear workflow pipeline)")
+    console.print("  2. [bold cyan]Parallel Mesh Network[/bold cyan] (Asynchronous peer-to-peer broker)")
+    try:
+        topo_choice = input("❯ ").strip()
+    except EOFError:
+        topo_choice = "1"
+    
+    is_mesh = (topo_choice == "2")
     start_time = time.time()
 
-    console.print(f"\\n[bold yellow]⚡ Dispatching task to {len(agents)} Hermes agents...[/bold yellow]\\n")
+    if is_mesh:
+        console.print(f"\\n[bold yellow]⚡ Dispatching task to {len(agents)} concurrent Mesh agents...[/bold yellow]\\n")
+        mesh_logs = asyncio.run(run_mesh_swarm_async(agents, model, user_prompt))
+        execution_logs = mesh_logs
+    else:
+        # Standard sequential execution
+        console.print(f"\\n[bold yellow]⚡ Dispatching task to {len(agents)} sequential Cascade agents...[/bold yellow]\\n")
+        previous_output = ""
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            transient=True,
+        ) as progress:
 
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        transient=True,
-    ) as progress:
+            for idx, agent_cfg in enumerate(agents):
+                agent_name = agent_cfg.get("name", f"Agent {idx + 1}")
+                agent_role = agent_cfg.get("role", "Operational task execution")
+                agent_specialty = agent_cfg.get("specialty", "General operations")
+                agent_pronouns = agent_cfg.get("pronouns", "They/Them")
 
-        for idx, agent_cfg in enumerate(agents):
-            agent_name = agent_cfg.get("name", f"Agent {idx + 1}")
-            agent_role = agent_cfg.get("role", "Operational task execution")
-            agent_specialty = agent_cfg.get("specialty", "General operations")
-            agent_pronouns = agent_cfg.get("pronouns", "They/Them")
+                task_desc = f"[bold green][{idx + 1}/{len(agents)}][/bold green] {agent_name} ({agent_specialty})..."
+                p_task = progress.add_task(description=task_desc, total=100)
 
-            task_desc = f"[bold green][{idx + 1}/{len(agents)}][/bold green] {agent_name} ({agent_specialty})..."
-            p_task = progress.add_task(description=task_desc, total=100)
-
-            # Build system prompt from the agent's config files
-            soul_md = agent_cfg.get("soulMd", "")
-            safety_md = agent_cfg.get("safetyMd", "")
-            
-            system_context = (
-                f"You are {agent_name}, an expert AI agent specializing in {agent_specialty}. "
-                f"Your role: {agent_role}. Your pronouns: {agent_pronouns}. "
-                f"You are agent {idx + 1} of {len(agents)} in a sequential pipeline swarm. "
-                f"Be concise and technical. Max 3 sentences."
-            )
-
-            # Build the task prompt with pipeline context
-            if idx == 0:
-                task_prompt = f"Analyze and plan the execution for this task: \\"{user_prompt}\\""
-            elif idx == len(agents) - 1:
-                task_prompt = (
-                    f"You are the Consensus Arbiter. Synthesize all pipeline outputs and "
-                    f"generate a final briefing. Previous agent output: \\"{previous_output[:500]}\\". "
-                    f"Original task: \\"{user_prompt}\\""
-                )
-            else:
-                task_prompt = (
-                    f"Apply your expertise in {agent_specialty} to this task: \\"{user_prompt}\\". "
-                    f"Previous agent ({agents[idx-1].get('name', 'prior agent')}) said: "
-                    f"\\"{previous_output[:300]}\\""
+                system_context = (
+                    f"You are {agent_name}, an expert AI agent specializing in {agent_specialty}. "
+                    f"Your role: {agent_role}. Your pronouns: {agent_pronouns}. "
+                    f"You are agent {idx + 1} of {len(agents)} in a sequential pipeline swarm. "
+                    f"Be concise and technical. Max 3 sentences."
                 )
 
-            # Execute through real Hermes AIAgent
-            try:
-                hermes_agent = AIAgent(model=model, quiet_mode=True)
-                
-                # Use chat with system context
-                response = hermes_agent.chat(
-                    f"[System: {system_context}]\\n\\n{task_prompt}"
-                )
-                agent_output = str(response).strip() if response else f"{agent_name} completed {agent_specialty} analysis."
-                
-            except Exception as e:
-                # If Hermes call fails (rate limit, network, etc), log the error but continue
-                agent_output = f"[Hermes Error: {str(e)[:100]}] {agent_name} could not complete - pipeline continues."
-                console.print(f"  [dim red]⚠ {agent_name} encountered an error: {str(e)[:80]}[/dim red]")
+                if idx == 0:
+                    task_prompt = f"Analyze and plan the execution for this task: \\"{user_prompt}\\""
+                elif idx == len(agents) - 1:
+                    task_prompt = (
+                        f"You are the Consensus Arbiter. Synthesize all pipeline outputs and "
+                        f"generate a final briefing. Previous agent output: \\"{previous_output[:500]}\\". "
+                        f"Original task: \\"{user_prompt}\\""
+                    )
+                else:
+                    task_prompt = (
+                        f"Apply your expertise in {agent_specialty} to this task: \\"{user_prompt}\\". "
+                        f"Previous agent ({agents[idx-1].get('name', 'prior agent')}) said: "
+                        f"\\"{previous_output[:300]}\\""
+                    )
 
-            progress.update(p_task, completed=100)
-            elapsed = time.time() - start_time
+                try:
+                    hermes_agent = AIAgent(model=model, quiet_mode=True)
+                    response = hermes_agent.chat(
+                        f"[System: {system_context}]\\n\\n{task_prompt}"
+                    )
+                    agent_output = str(response).strip() if response else f"{agent_name} completed {agent_specialty} analysis."
+                except Exception as e:
+                    agent_output = f"[Hermes Error: {str(e)[:100]}] {agent_name} could not complete - pipeline continues."
+                    console.print(f"  [dim red]⚠ {agent_name} encountered an error: {str(e)[:80]}[/dim red]")
 
-            # Log the execution
-            log_entry = {
-                "agentName": agent_name,
-                "role": agent_role,
-                "specialty": agent_specialty,
-                "output": agent_output,
-                "timeTakenSeconds": round(elapsed, 1),
-                "status": "Completed"
-            }
-            execution_logs.append(log_entry)
+                progress.update(p_task, completed=100)
+                elapsed = time.time() - start_time
 
-            console.print(f"[bold green]✔[/bold green] [bold cyan]{agent_name}[/bold cyan] [dim]({agent_specialty})[/dim]:")
-            console.print(f"  [italic white]\\"{agent_output[:200]}\\"[/italic white]\\n")
+                log_entry = {
+                    "agentName": agent_name,
+                    "role": agent_role,
+                    "specialty": agent_specialty,
+                    "output": agent_output,
+                    "timeTakenSeconds": round(elapsed, 1),
+                    "status": "Completed"
+                }
+                execution_logs.append(log_entry)
 
-            previous_output = agent_output
+                console.print(f"[bold green]✔[/bold green] [bold cyan]{agent_name}[/bold cyan] [dim]({agent_specialty})[/dim]:")
+                console.print(f"  [italic white]\\"{agent_output[:200]}\\"[/italic white]\\n")
+
+                previous_output = agent_output
 
     # Compute Merkle Root over all execution logs
     merkle_root = calculate_merkle_root(execution_logs)
 
     # Save comprehensive report
-    report_lines = [
-        f"# {pod_name} — Swarm Execution Report",
-        f"",
-        f"**Task:** {user_prompt}",
-        f"**Agents Executed:** {len(execution_logs)}",
-        f"**Framework:** Nous Research hermes-agent",
-        f"**Model:** {model}",
-        f"**Merkle Root:** \`sha256:{merkle_root}\`",
-        f"**Timestamp:** {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}",
-        f"",
-        f"---",
-        f"",
-    ]
-    for i, log in enumerate(execution_logs):
-        report_lines.append(f"## Agent {i + 1}: {log['agentName']}")
-        report_lines.append(f"**Specialty:** {log['specialty']}  ")
-        report_lines.append(f"**Time:** {log['timeTakenSeconds']}s  ")
-        report_lines.append(f"")
-        report_lines.append(f"> {log['output']}")
-        report_lines.append(f"")
+    if is_mesh:
+        report_lines = [
+            f"# {pod_name} — Mesh Swarm Execution Report",
+            f"",
+            f"**Task:** {user_prompt}",
+            f"**Topology:** Parallel Mesh Network",
+            f"**Framework:** Nous Research hermes-agent",
+            f"**Model:** {model}",
+            f"**Merkle Root:** \`sha256:{merkle_root}\`",
+            f"**Timestamp:** {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}",
+            f"",
+            f"---",
+            f"",
+            f"## 💬 Swarm Communication Board Log",
+            f"",
+        ]
+        for log in execution_logs:
+            report_lines.append(f"* **{log['sender']}** ➔ **{log['recipient']}**:")
+            report_lines.append(f"  > {log['content']}")
+            report_lines.append("")
+    else:
+        report_lines = [
+            f"# {pod_name} — Swarm Execution Report",
+            f"",
+            f"**Task:** {user_prompt}",
+            f"**Topology:** Sequential Cascade",
+            f"**Framework:** Nous Research hermes-agent",
+            f"**Model:** {model}",
+            f"**Merkle Root:** \`sha256:{merkle_root}\`",
+            f"**Timestamp:** {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}",
+            f"",
+            f"---",
+            f"",
+        ]
+        for i, log in enumerate(execution_logs):
+            report_lines.append(f"## Agent {i + 1}: {log['agentName']}")
+            report_lines.append(f"**Specialty:** {log['specialty']}  ")
+            report_lines.append(f"**Time:** {log['timeTakenSeconds']}s  ")
+            report_lines.append(f"")
+            report_lines.append(f"> {log['output']}")
+            report_lines.append(f"")
 
     report_lines.append(f"---")
     report_lines.append(f"")
-    report_lines.append(f"**Consensus:** All {len(execution_logs)} agents completed execution.")
+    report_lines.append(f"**Consensus:** Swarm execution completed successfully.")
     report_lines.append(f"**Merkle Root Attestation:** \`sha256:{merkle_root}\`")
 
     report_content = "\\n".join(report_lines)
@@ -1814,7 +1955,7 @@ def run_hermes_swarm():
 
     console.print(Panel(
         f"[bold bright_green]🎉 SWARM EXECUTION COMPLETE[/bold bright_green]\\n\\n"
-        f"Agents Executed: [cyan]{len(execution_logs)}[/cyan]\\n"
+        f"Logs Processed: [cyan]{len(execution_logs)}[/cyan]\\n"
         f"Merkle Root: [yellow]sha256:{merkle_root[:32]}...[/yellow]\\n"
         f"Report saved: [bold cyan]swarm_report_local.md[/bold cyan]",
         border_style="bright_green"
@@ -1846,6 +1987,7 @@ import sys
 import time
 import hashlib
 import requests
+import asyncio
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -1943,6 +2085,104 @@ def calculate_merkle_root(logs: list) -> str:
     return leaves[0]
 
 # ---------------------------------------------------------------------------
+# Parallel Mesh Network Topology Classes and Functions
+# ---------------------------------------------------------------------------
+class MeshMessageBroker:
+    def __init__(self, console_obj):
+        self.message_board = []
+        self.queues = {}
+        self.console = console_obj
+        self.active_agents = set()
+
+    def register_agent(self, agent_name):
+        self.queues[agent_name] = asyncio.Queue()
+        self.active_agents.add(agent_name)
+
+    async def send_message(self, sender, recipient, content):
+        msg = {"sender": sender, "content": content}
+        self.message_board.append({
+            "sender": sender,
+            "recipient": recipient,
+            "content": content,
+            "timestamp": time.time()
+        })
+        
+        if recipient == "All":
+            self.console.print(f"  [bold magenta]📣 Broadcast from {sender}:[/bold magenta] [italic]{content[:120]}...[/italic]")
+            for name, q in self.queues.items():
+                if name != sender:
+                    await q.put(msg)
+        else:
+            self.console.print(f"  [bold cyan]✉ {sender} ➔ {recipient}:[/bold cyan] [italic]{content[:120]}...[/italic]")
+            if recipient in self.queues:
+                await self.queues[recipient].put(msg)
+
+
+async def run_mesh_agent_worker(agent_name, agent_cfg, broker, user_prompt, max_turns=3):
+    broker.register_agent(agent_name)
+    agent_specialty = agent_cfg.get("specialty", "General")
+    agent_role = agent_cfg.get("role", "Swarm agent")
+    
+    system_context = (
+        f"You are {agent_name}, an expert AI agent specializing in {agent_specialty}. "
+        f"Your role: {agent_role}. "
+        f"You operate concurrently inside an Asynchronous Mesh Swarm. "
+        f"Be concise, technical, and address fellow agents directly. Max 2 sentences."
+    )
+
+    # Planner starts the discussion
+    if agent_specialty == "Workflow planning":
+        await asyncio.sleep(0.5)
+        intro = f"Swarm initiated. Our objective is: '{user_prompt}'. I propose we compile the codebase specifications and execute security scans. Swarms Consensus Arbiter, please verify compliance when drafts are ready."
+        await broker.send_message(agent_name, "All", intro)
+    
+    turns = 0
+    while turns < max_turns:
+        try:
+            msg = await asyncio.wait_for(broker.queues[agent_name].get(), timeout=4.0)
+            sender = msg["sender"]
+            content = msg["content"]
+            
+            prompt = (
+                f"[System: {system_context}]\\n\\n"
+                f"Global Swarm Goal: '{user_prompt}'\\n"
+                f"Incoming Message from {sender}: '{content}'\\n\\n"
+                f"Respond to this message with your specific domain expert input. If you are the Consensus Arbiter and all nodes look complete, print 'Consensus Sealed'. Keep it very short."
+            )
+            
+            response_str = query_llm(prompt, system_context)
+            turns += 1
+            
+            if agent_cfg.get("specialty") == "Consensus polling":
+                if "consensus sealed" in response_str.lower() or turns == max_turns:
+                    await broker.send_message(agent_name, "All", f"Consensus Sealed: Swarm objective achieved. Attestation active.")
+                    break
+                else:
+                    await broker.send_message(agent_name, "All", f"Consensus Update: Reviewing message from {sender}.")
+            else:
+                await broker.send_message(agent_name, "Swarms Consensus Arbiter", response_str)
+                
+        except asyncio.TimeoutError:
+            if agent_cfg.get("specialty") == "Consensus polling":
+                await broker.send_message(agent_name, "All", "Consensus Sealed: Swarm finalized by timeout attestation.")
+                break
+            else:
+                await broker.send_message(agent_name, "Swarms Consensus Arbiter", f"{agent_name} reporting specialty checks complete.")
+                break
+
+
+async def run_mesh_swarm_async(agents, user_prompt):
+    broker = MeshMessageBroker(console)
+    tasks = []
+    
+    for agent_cfg in agents:
+        agent_name = agent_cfg.get("name", "Specialist Node")
+        tasks.append(run_mesh_agent_worker(agent_name, agent_cfg, broker, user_prompt))
+        
+    await asyncio.gather(*tasks)
+    return broker.message_board
+
+# ---------------------------------------------------------------------------
 # Main Pipeline
 # ---------------------------------------------------------------------------
 def execute_pipeline():
@@ -1992,82 +2232,117 @@ def execute_pipeline():
         table.add_row(str(i + 1), a.get("name", "N/A"), a.get("specialty", "N/A"), a.get("productivityBoost", "1.0x"))
     console.print(table)
 
-    logs = []
-    previous_output = ""
+    # Get topology choice
+    console.print("\\n[bold white]Choose Swarm Topology:[/bold white]")
+    console.print("  1. [bold cyan]Sequential Cascade[/bold cyan] (Standard linear workflow pipeline)")
+    console.print("  2. [bold cyan]Parallel Mesh Network[/bold cyan] (Asynchronous peer-to-peer broker)")
+    try:
+        topo_choice = input("❯ ").strip()
+    except EOFError:
+        topo_choice = "1"
+    
+    is_mesh = (topo_choice == "2")
     start_time = time.time()
 
-    console.print(f"\\n[bold yellow]⚡ Dispatching to {len(agents)} agents via {ENGINE}...[/bold yellow]\\n")
+    if is_mesh:
+        console.print(f"\\n[bold yellow]⚡ Dispatching to {len(agents)} concurrent Mesh agents via {ENGINE}...[/bold yellow]\\n")
+        mesh_logs = asyncio.run(run_mesh_swarm_async(agents, user_prompt))
+        logs = mesh_logs
+    else:
+        console.print(f"\\n[bold yellow]⚡ Dispatching to {len(agents)} sequential Cascade agents via {ENGINE}...[/bold yellow]\\n")
+        previous_output = ""
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            transient=True,
+        ) as progress:
 
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        transient=True,
-    ) as progress:
+            for idx, agent in enumerate(agents):
+                agent_name = agent.get("name", f"Agent {idx + 1}")
+                agent_specialty = agent.get("specialty", "Operations")
+                agent_role = agent.get("role", "Task execution")
 
-        for idx, agent in enumerate(agents):
-            agent_name = agent.get("name", f"Agent {idx + 1}")
-            agent_specialty = agent.get("specialty", "Operations")
-            agent_role = agent.get("role", "Task execution")
+                task_desc = f"[bold green][{idx + 1}/{len(agents)}][/bold green] {agent_name} executing..."
+                p_task = progress.add_task(description=task_desc, total=100)
 
-            task_desc = f"[bold green][{idx + 1}/{len(agents)}][/bold green] {agent_name} executing..."
-            p_task = progress.add_task(description=task_desc, total=100)
-
-            # Build prompts
-            system_instruction = (
-                f"You are {agent_name}, expert in {agent_specialty}. "
-                f"Your role: {agent_role}. Keep response short, max 2 sentences."
-            )
-
-            if idx == 0:
-                llm_prompt = f"Analyze and plan: \\"{user_prompt}\\""
-            elif idx == len(agents) - 1:
-                llm_prompt = (
-                    f"Synthesize all previous outputs and seal consensus for: \\"{user_prompt}\\". "
-                    f"Previous: \\"{previous_output[:300]}\\""
-                )
-            else:
-                llm_prompt = (
-                    f"As {agent_name}, apply {agent_specialty} to: \\"{user_prompt}\\". "
-                    f"Previous agent said: \\"{previous_output[:200]}\\""
+                # Build prompts
+                system_instruction = (
+                    f"You are {agent_name}, expert in {agent_specialty}. "
+                    f"Your role: {agent_role}. Keep response short, max 2 sentences."
                 )
 
-            output = query_llm(llm_prompt, system_instruction)
-            progress.update(p_task, completed=100)
+                if idx == 0:
+                    llm_prompt = f"Analyze and plan: \\"{user_prompt}\\""
+                elif idx == len(agents) - 1:
+                    llm_prompt = (
+                        f"Synthesize all previous outputs and seal consensus for: \\"{user_prompt}\\". "
+                        f"Previous: \\"{previous_output[:300]}\\""
+                    )
+                else:
+                    llm_prompt = (
+                        f"As {agent_name}, apply {agent_specialty} to: \\"{user_prompt}\\". "
+                        f"Previous agent said: \\"{previous_output[:200]}\\""
+                    )
 
-            elapsed = time.time() - start_time
-            console.print(f"[bold green]✔[/bold green] [bold cyan]{agent_name}[/bold cyan] [dim]({agent_specialty})[/dim]:")
-            console.print(f"  [italic white]\\"{output[:200]}\\"[/italic white]\\n")
+                output = query_llm(llm_prompt, system_instruction)
+                progress.update(p_task, completed=100)
 
-            logs.append({
-                "agentName": agent_name,
-                "role": agent_role,
-                "specialty": agent_specialty,
-                "output": output,
-                "timeTakenSeconds": round(elapsed, 1),
-                "engine": ENGINE
-            })
+                elapsed = time.time() - start_time
+                console.print(f"[bold green]✔[/bold green] [bold cyan]{agent_name}[/bold cyan] [dim]({agent_specialty})[/dim]:")
+                console.print(f"  [italic white]\\"{output[:200]}\\"[/italic white]\\n")
 
-            previous_output = output
+                logs.append({
+                    "agentName": agent_name,
+                    "role": agent_role,
+                    "specialty": agent_specialty,
+                    "output": output,
+                    "timeTakenSeconds": round(elapsed, 1),
+                    "engine": ENGINE
+                })
+
+                previous_output = output
 
     # Consensus & Merkle
     merkle_root = calculate_merkle_root(logs)
 
     # Save report
-    report_lines = [
-        f"# {pod_name} — Local Swarm Report",
-        f"",
-        f"**Task:** {user_prompt}",
-        f"**Engine:** {ENGINE}",
-        f"**Agents:** {len(logs)}",
-        f"**Merkle Root:** \`sha256:{merkle_root}\`",
-        f"",
-    ]
-    for i, log in enumerate(logs):
-        report_lines.append(f"## {i+1}. {log['agentName']} ({log['specialty']})")
-        report_lines.append(f"> {log['output']}")
-        report_lines.append("")
-    
-    report_lines.append(f"**Consensus Sealed.** Merkle: \`sha256:{merkle_root}\`")
+    if is_mesh:
+        report_lines = [
+            f"# {pod_name} — Local Mesh Swarm Report",
+            f"",
+            f"**Task:** {user_prompt}",
+            f"**Engine:** {ENGINE}",
+            f"**Topology:** Parallel Mesh Network",
+            f"**Agents:** {len(logs)}",
+            f"**Merkle Root:** \`sha256:{merkle_root}\`",
+            f"",
+            f"## 💬 Swarm Communication Board Log",
+            f"",
+        ]
+        for log in logs:
+            report_lines.append(f"* **{log['sender']}** ➔ **{log['recipient']}**:")
+            report_lines.append(f"  > {log['content']}")
+            report_lines.append("")
+        
+        report_lines.append(f"**Consensus Sealed.** Merkle: \`sha256:{merkle_root}\`")
+    else:
+        report_lines = [
+            f"# {pod_name} — Local Swarm Report",
+            f"",
+            f"**Task:** {user_prompt}",
+            f"**Engine:** {ENGINE}",
+            f"**Topology:** Sequential Cascade",
+            f"**Agents:** {len(logs)}",
+            f"**Merkle Root:** \`sha256:{merkle_root}\`",
+            f"",
+        ]
+        for i, log in enumerate(logs):
+            report_lines.append(f"## {i+1}. {log['agentName']} ({log['specialty']})")
+            report_lines.append(f"> {log['output']}")
+            report_lines.append("")
+        
+        report_lines.append(f"**Consensus Sealed.** Merkle: \`sha256:{merkle_root}\`")
 
     with open("swarm_report_local.md", "w", encoding="utf-8") as rf:
         rf.write("\\n".join(report_lines))
@@ -3333,6 +3608,42 @@ if __name__ == "__main__":
                                 placeholder="Write high-level prompt, e.g. Audit current designs and structure client presentation deck"
                               />
 
+                              {/* Swarm Topology Option Selector */}
+                              <div className="space-y-1.5 bg-[#05070a] border border-white/5 p-3 rounded-xl">
+                                <div className="flex justify-between items-center">
+                                  <label className="text-[10px] font-mono text-slate-400 uppercase font-bold tracking-wider">
+                                    Swarm Orchestration Topology
+                                  </label>
+                                  <span className="text-[9px] font-mono text-slate-500">
+                                    {swarmTopology === "sequential" ? "Refinement Assembly Line" : "Concurrent Message Network"}
+                                  </span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 mt-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => setSwarmTopology("sequential")}
+                                    className={`py-2 rounded-lg text-[10px] font-mono uppercase tracking-wider font-bold transition-all border ${
+                                      swarmTopology === "sequential"
+                                        ? "bg-blue-950/40 text-blue-400 border-blue-500/40 shadow shadow-blue-500/5"
+                                        : "bg-transparent border-transparent text-slate-500 hover:text-slate-300"
+                                    }`}
+                                  >
+                                    🔗 Sequential Cascade
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setSwarmTopology("mesh")}
+                                    className={`py-2 rounded-lg text-[10px] font-mono uppercase tracking-wider font-bold transition-all border ${
+                                      swarmTopology === "mesh"
+                                        ? "bg-green-950/40 text-green-400 border-green-500/40 shadow shadow-green-500/5"
+                                        : "bg-transparent border-transparent text-slate-500 hover:text-slate-300"
+                                    }`}
+                                  >
+                                    🌐 Parallel Mesh Net
+                                  </button>
+                                </div>
+                              </div>
+
                               {knowledgeChunks.length > 0 ? (
                                 <div className="text-[10px] font-mono text-teal-400 flex items-center gap-1.5 bg-teal-950/20 border border-teal-900/30 px-3 py-1.5 rounded-lg">
                                   <span className="inline-block w-2 bg-teal-400 h-2 rounded-full animate-ping shrink-0" />
@@ -3361,7 +3672,7 @@ if __name__ == "__main__":
                                 {customSimRunning ? (
                                   <>
                                     <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                    Processing Merkle Tree Cascade...
+                                    {swarmTopology === "sequential" ? "Processing Merkle Tree Cascade..." : "Orchestrating Broker Mesh..."}
                                   </>
                                 ) : (
                                   <>
@@ -3371,27 +3682,64 @@ if __name__ == "__main__":
                               </button>
                             </div>
 
-                            {/* SEQUENTIAL Blue-print list */}
+                            {/* Dynamic Swarm Workflow Blueprint */}
                             <div className="mt-4 border border-white/5 rounded-2xl p-4 bg-[#05070a]/40 space-y-3">
                               <h6 className="font-sans text-xs font-bold text-slate-450 uppercase tracking-widest block">
-                                Cascade Workflow Blueprint
+                                {swarmTopology === "sequential" 
+                                  ? "Sequential Cascade Workflow Blueprint" 
+                                  : "Parallel Mesh Net Router Gateway Directory"}
                               </h6>
                               <div className="space-y-3.5 text-xs">
-                                {(customPodData.workflowSteps || []).map((step: any, idx: number) => {
-                                  const stepCol = getGoogleColorForIndex(idx);
-                                  return (
-                                    <div key={idx} className="flex gap-3 text-left">
-                                      <span className="w-5 h-5 rounded border text-[10px] font-mono font-bold flex items-center justify-center shrink-0 bg-[#05070a]" style={{ color: stepCol, borderColor: `${stepCol}40` }}>
-                                        {idx + 1}
+                                {swarmTopology === "sequential" ? (
+                                  (customPodData.workflowSteps || []).map((step: any, idx: number) => {
+                                    const stepCol = getGoogleColorForIndex(idx);
+                                    return (
+                                      <div key={idx} className="flex gap-3 text-left">
+                                        <span className="w-5 h-5 rounded border text-[10px] font-mono font-bold flex items-center justify-center shrink-0 bg-[#05070a]" style={{ color: stepCol, borderColor: `${stepCol}40` }}>
+                                          {idx + 1}
+                                        </span>
+                                        <div className="space-y-0.5">
+                                          <span className="font-bold text-slate-200 block">{step.title}</span>
+                                          <span className="text-[10px] font-mono block font-semibold" style={{ color: stepCol }}>Responsible: {step.executor}</span>
+                                          <p className="text-[10px] text-slate-450 leading-normal">{step.description}</p>
+                                        </div>
+                                      </div>
+                                    );
+                                  })
+                                ) : (
+                                  <div className="space-y-3">
+                                    <div className="flex gap-3 text-left">
+                                      <span className="w-5 h-5 rounded border text-[10px] font-mono font-bold flex items-center justify-center shrink-0 bg-[#05070a] text-green-400 border-green-500/40">
+                                        📢
                                       </span>
                                       <div className="space-y-0.5">
-                                        <span className="font-bold text-slate-200 block">{step.title}</span>
-                                        <span className="text-[10px] font-mono block font-semibold" style={{ color: stepCol }}>Responsible: {step.executor}</span>
-                                        <p className="text-[10px] text-slate-450 leading-normal">{step.description}</p>
+                                        <span className="font-bold text-slate-200 block">Swarm Planner Proposes</span>
+                                        <span className="text-[10px] font-mono block font-semibold text-green-400">Node Gateway Address: router://openclaw/node-1</span>
+                                        <p className="text-[10px] text-slate-450 leading-normal">Deconstructs tasks and broadcasts objectives to all other specialty agents concurrently.</p>
                                       </div>
                                     </div>
-                                  );
-                                })}
+                                    <div className="flex gap-3 text-left">
+                                      <span className="w-5 h-5 rounded border text-[10px] font-mono font-bold flex items-center justify-center shrink-0 bg-[#05070a] text-[#4285F4] border-blue-500/40">
+                                        ✉️
+                                      </span>
+                                      <div className="space-y-0.5">
+                                        <span className="font-bold text-slate-200 block">Parallel Peer Feedbacks</span>
+                                        <span className="text-[10px] font-mono block font-semibold text-[#4285F4]">Node Gateway Address: router://openclaw/node-2 to node-11</span>
+                                        <p className="text-[10px] text-slate-450 leading-normal">All 10 specialty agents analyze parameters and route comments to the Arbiter concurrently via Mesh Broker.</p>
+                                      </div>
+                                    </div>
+                                    <div className="flex gap-3 text-left">
+                                      <span className="w-5 h-5 rounded border text-[10px] font-mono font-bold flex items-center justify-center shrink-0 bg-[#05070a] text-yellow-400 border-yellow-500/40">
+                                        ⚖️
+                                      </span>
+                                      <div className="space-y-0.5">
+                                        <span className="font-bold text-slate-200 block">Consensus Verdict Attestation</span>
+                                        <span className="text-[10px] font-mono block font-semibold text-yellow-400">Node Gateway Address: router://openclaw/node-12</span>
+                                        <p className="text-[10px] text-slate-450 leading-normal">The Consensus Arbiter synthesizes comments, validates Merkle-attested compliance, and issues the final verdict.</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>

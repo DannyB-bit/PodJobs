@@ -9,3 +9,9 @@ coverage/
 Script.md
 *.tsbuildinfo
 *.exe
+devteam_pod/
+.venv/
+venv/
+__pycache__/
+*.pyc
+swarm_report_local.md

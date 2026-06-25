@@ -20,6 +20,7 @@ import os
 import sys
 import time
 import hashlib
+import asyncio
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -182,6 +183,116 @@ def ensure_api_keys():
         console.print("\n[yellow]Continuing in simulation/offline mode.[/yellow]\n")
 
 # ---------------------------------------------------------------------------
+# Parallel Mesh Network Topology Classes and Functions
+# ---------------------------------------------------------------------------
+class MeshMessageBroker:
+    def __init__(self, console_obj):
+        self.message_board = []
+        self.queues = {}
+        self.console = console_obj
+        self.active_agents = set()
+
+    def register_agent(self, agent_name):
+        self.queues[agent_name] = asyncio.Queue()
+        self.active_agents.add(agent_name)
+
+    async def send_message(self, sender, recipient, content):
+        msg = {"sender": sender, "content": content}
+        self.message_board.append({
+            "sender": sender,
+            "recipient": recipient,
+            "content": content,
+            "timestamp": time.time()
+        })
+        
+        if recipient == "All":
+            self.console.print(f"  [bold magenta]📣 Broadcast from {sender}:[/bold magenta] [italic]{content[:120]}...[/italic]")
+            for name, q in self.queues.items():
+                if name != sender:
+                    await q.put(msg)
+        else:
+            self.console.print(f"  [bold cyan]✉ {sender} ➔ {recipient}:[/bold cyan] [italic]{content[:120]}...[/italic]")
+            if recipient in self.queues:
+                await self.queues[recipient].put(msg)
+
+
+async def run_mesh_agent_worker(agent_name, agent_cfg, model, broker, user_prompt, max_turns=3):
+    broker.register_agent(agent_name)
+    agent_specialty = agent_cfg.get("specialty", "General")
+    agent_role = agent_cfg.get("role", "Swarm agent")
+    
+    try:
+        system_context = (
+            f"You are {agent_name}, an expert AI agent specializing in {agent_specialty}. "
+            f"Your role: {agent_role}. "
+            f"You operate concurrently inside an Asynchronous Mesh Swarm. "
+            f"Be concise, technical, and address fellow agents directly. Max 2 sentences."
+        )
+        hermes_agent = AIAgent(model=model, quiet_mode=True)
+    except Exception as e:
+        class MockAgent:
+            def chat(self, p):
+                return f"[Mesh Analysis] {agent_name} verified specialty constraints for: '{p[-80:]}'."
+        hermes_agent = MockAgent()
+
+    # Planner starts the discussion
+    if agent_specialty == "Workflow planning":
+        await asyncio.sleep(0.5)
+        intro = f"Swarm initiated. Our objective is: '{user_prompt}'. I propose we compile the codebase specifications and execute security scans. Swarms Consensus Arbiter, please verify compliance when drafts are ready."
+        await broker.send_message(agent_name, "All", intro)
+    
+    turns = 0
+    while turns < max_turns:
+        try:
+            msg = await asyncio.wait_for(broker.queues[agent_name].get(), timeout=4.0)
+            sender = msg["sender"]
+            content = msg["content"]
+            
+            prompt = (
+                f"[System: {system_context}]\n\n"
+                f"Global Swarm Goal: '{user_prompt}'\n"
+                f"Incoming Message from {sender}: '{content}'\n\n"
+                f"Respond to this message with your specific domain expert input. If you are the Consensus Arbiter and all nodes look complete, print 'Consensus Sealed'. Keep it very short."
+            )
+            
+            try:
+                response = hermes_agent.chat(prompt)
+                response_str = str(response).strip() if response else f"{agent_name} validated task."
+            except Exception as e:
+                response_str = f"[Simulated Output] {agent_name} checked state for {sender}'s brief."
+
+            turns += 1
+            
+            if agent_cfg.get("specialty") == "Consensus polling":
+                if "consensus sealed" in response_str.lower() or turns == max_turns:
+                    await broker.send_message(agent_name, "All", f"Consensus Sealed: Swarm objective achieved. Attestation active.")
+                    break
+                else:
+                    await broker.send_message(agent_name, "All", f"Consensus Update: Reviewing message from {sender}.")
+            else:
+                await broker.send_message(agent_name, "Swarms Consensus Arbiter", response_str)
+                
+        except asyncio.TimeoutError:
+            if agent_cfg.get("specialty") == "Consensus polling":
+                await broker.send_message(agent_name, "All", "Consensus Sealed: Swarm finalized by timeout attestation.")
+                break
+            else:
+                await broker.send_message(agent_name, "Swarms Consensus Arbiter", f"{agent_name} reporting specialty checks complete.")
+                break
+
+
+async def run_mesh_swarm_async(agents, model, user_prompt):
+    broker = MeshMessageBroker(console)
+    tasks = []
+    
+    for agent_cfg in agents:
+        agent_name = agent_cfg.get("name", "Specialist Node")
+        tasks.append(run_mesh_agent_worker(agent_name, agent_cfg, model, broker, user_prompt))
+        
+    await asyncio.gather(*tasks)
+    return broker.message_board
+
+# ---------------------------------------------------------------------------
 # Main Swarm Orchestrator
 # ---------------------------------------------------------------------------
 def run_hermes_swarm():
@@ -234,117 +345,145 @@ def run_hermes_swarm():
         table.add_row(str(i + 1), a.get("name", "N/A"), a.get("specialty", "N/A"), a.get("pronouns", "They/Them"))
     console.print(table)
 
-    # Execute each agent through Hermes
+    # Determine topology and run swarm
     execution_logs = []
-    previous_output = ""
+    is_mesh = False
+    
+    # Get topology choice
+    console.print("\n[bold white]Choose Swarm Topology:[/bold white]")
+    console.print("  1. [bold cyan]Sequential Cascade[/bold cyan] (Standard linear workflow pipeline)")
+    console.print("  2. [bold cyan]Parallel Mesh Network[/bold cyan] (Asynchronous peer-to-peer broker)")
+    try:
+        topo_choice = input("❯ ").strip()
+    except EOFError:
+        topo_choice = "1"
+    
+    is_mesh = (topo_choice == "2")
     start_time = time.time()
 
-    console.print(f"\n[bold yellow]⚡ Dispatching task to {len(agents)} Hermes agents...[/bold yellow]\n")
+    if is_mesh:
+        console.print(f"\n[bold yellow]⚡ Dispatching task to {len(agents)} concurrent Mesh agents...[/bold yellow]\n")
+        mesh_logs = asyncio.run(run_mesh_swarm_async(agents, model, user_prompt))
+        execution_logs = mesh_logs
+    else:
+        # Standard sequential execution
+        console.print(f"\n[bold yellow]⚡ Dispatching task to {len(agents)} sequential Cascade agents...[/bold yellow]\n")
+        previous_output = ""
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            transient=True,
+        ) as progress:
 
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        transient=True,
-    ) as progress:
+            for idx, agent_cfg in enumerate(agents):
+                agent_name = agent_cfg.get("name", f"Agent {idx + 1}")
+                agent_role = agent_cfg.get("role", "Operational task execution")
+                agent_specialty = agent_cfg.get("specialty", "General operations")
+                agent_pronouns = agent_cfg.get("pronouns", "They/Them")
 
-        for idx, agent_cfg in enumerate(agents):
-            agent_name = agent_cfg.get("name", f"Agent {idx + 1}")
-            agent_role = agent_cfg.get("role", "Operational task execution")
-            agent_specialty = agent_cfg.get("specialty", "General operations")
-            agent_pronouns = agent_cfg.get("pronouns", "They/Them")
+                task_desc = f"[bold green][{idx + 1}/{len(agents)}][/bold green] {agent_name} ({agent_specialty})..."
+                p_task = progress.add_task(description=task_desc, total=100)
 
-            task_desc = f"[bold green][{idx + 1}/{len(agents)}][/bold green] {agent_name} ({agent_specialty})..."
-            p_task = progress.add_task(description=task_desc, total=100)
-
-            # Build system prompt from the agent's config files
-            soul_md = agent_cfg.get("soulMd", "")
-            safety_md = agent_cfg.get("safetyMd", "")
-            
-            system_context = (
-                f"You are {agent_name}, an expert AI agent specializing in {agent_specialty}. "
-                f"Your role: {agent_role}. Your pronouns: {agent_pronouns}. "
-                f"You are agent {idx + 1} of {len(agents)} in a sequential pipeline swarm. "
-                f"Be concise and technical. Max 3 sentences."
-            )
-
-            # Build the task prompt with pipeline context
-            if idx == 0:
-                task_prompt = f"Analyze and plan the execution for this task: \"{user_prompt}\""
-            elif idx == len(agents) - 1:
-                task_prompt = (
-                    f"You are the Consensus Arbiter. Synthesize all pipeline outputs and "
-                    f"generate a final briefing. Previous agent output: \"{previous_output[:500]}\". "
-                    f"Original task: \"{user_prompt}\""
-                )
-            else:
-                task_prompt = (
-                    f"Apply your expertise in {agent_specialty} to this task: \"{user_prompt}\". "
-                    f"Previous agent ({agents[idx-1].get('name', 'prior agent')}) said: "
-                    f"\"{previous_output[:300]}\""
+                system_context = (
+                    f"You are {agent_name}, an expert AI agent specializing in {agent_specialty}. "
+                    f"Your role: {agent_role}. Your pronouns: {agent_pronouns}. "
+                    f"You are agent {idx + 1} of {len(agents)} in a sequential pipeline swarm. "
+                    f"Be concise and technical. Max 3 sentences."
                 )
 
-            # Execute through real Hermes AIAgent
-            try:
-                hermes_agent = AIAgent(model=model, quiet_mode=True)
-                
-                # Use chat with system context
-                response = hermes_agent.chat(
-                    f"[System: {system_context}]\n\n{task_prompt}"
-                )
-                agent_output = str(response).strip() if response else f"{agent_name} completed {agent_specialty} analysis."
-                
-            except Exception as e:
-                # If Hermes call fails (rate limit, network, etc), log the error but continue
-                agent_output = f"[Hermes Error: {str(e)[:100]}] {agent_name} could not complete - pipeline continues."
-                console.print(f"  [dim red]⚠ {agent_name} encountered an error: {str(e)[:80]}[/dim red]")
+                if idx == 0:
+                    task_prompt = f"Analyze and plan the execution for this task: \"{user_prompt}\""
+                elif idx == len(agents) - 1:
+                    task_prompt = (
+                        f"You are the Consensus Arbiter. Synthesize all pipeline outputs and "
+                        f"generate a final briefing. Previous agent output: \"{previous_output[:500]}\". "
+                        f"Original task: \"{user_prompt}\""
+                    )
+                else:
+                    task_prompt = (
+                        f"Apply your expertise in {agent_specialty} to this task: \"{user_prompt}\". "
+                        f"Previous agent ({agents[idx-1].get('name', 'prior agent')}) said: "
+                        f"\"{previous_output[:300]}\""
+                    )
 
-            progress.update(p_task, completed=100)
-            elapsed = time.time() - start_time
+                try:
+                    hermes_agent = AIAgent(model=model, quiet_mode=True)
+                    response = hermes_agent.chat(
+                        f"[System: {system_context}]\n\n{task_prompt}"
+                    )
+                    agent_output = str(response).strip() if response else f"{agent_name} completed {agent_specialty} analysis."
+                except Exception as e:
+                    agent_output = f"[Hermes Error: {str(e)[:100]}] {agent_name} could not complete - pipeline continues."
+                    console.print(f"  [dim red]⚠ {agent_name} encountered an error: {str(e)[:80]}[/dim red]")
 
-            # Log the execution
-            log_entry = {
-                "agentName": agent_name,
-                "role": agent_role,
-                "specialty": agent_specialty,
-                "output": agent_output,
-                "timeTakenSeconds": round(elapsed, 1),
-                "status": "Completed"
-            }
-            execution_logs.append(log_entry)
+                progress.update(p_task, completed=100)
+                elapsed = time.time() - start_time
 
-            console.print(f"[bold green]✔[/bold green] [bold cyan]{agent_name}[/bold cyan] [dim]({agent_specialty})[/dim]:")
-            console.print(f"  [italic white]\"{agent_output[:200]}\"[/italic white]\n")
+                log_entry = {
+                    "agentName": agent_name,
+                    "role": agent_role,
+                    "specialty": agent_specialty,
+                    "output": agent_output,
+                    "timeTakenSeconds": round(elapsed, 1),
+                    "status": "Completed"
+                }
+                execution_logs.append(log_entry)
 
-            previous_output = agent_output
+                console.print(f"[bold green]✔[/bold green] [bold cyan]{agent_name}[/bold cyan] [dim]({agent_specialty})[/dim]:")
+                console.print(f"  [italic white]\"{agent_output[:200]}\"[/italic white]\n")
+
+                previous_output = agent_output
 
     # Compute Merkle Root over all execution logs
     merkle_root = calculate_merkle_root(execution_logs)
 
     # Save comprehensive report
-    report_lines = [
-        f"# {pod_name} — Swarm Execution Report",
-        f"",
-        f"**Task:** {user_prompt}",
-        f"**Agents Executed:** {len(execution_logs)}",
-        f"**Framework:** Nous Research hermes-agent",
-        f"**Model:** {model}",
-        f"**Merkle Root:** `sha256:{merkle_root}`",
-        f"**Timestamp:** {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}",
-        f"",
-        f"---",
-        f"",
-    ]
-    for i, log in enumerate(execution_logs):
-        report_lines.append(f"## Agent {i + 1}: {log['agentName']}")
-        report_lines.append(f"**Specialty:** {log['specialty']}  ")
-        report_lines.append(f"**Time:** {log['timeTakenSeconds']}s  ")
-        report_lines.append(f"")
-        report_lines.append(f"> {log['output']}")
-        report_lines.append(f"")
+    if is_mesh:
+        report_lines = [
+            f"# {pod_name} — Mesh Swarm Execution Report",
+            f"",
+            f"**Task:** {user_prompt}",
+            f"**Topology:** Parallel Mesh Network",
+            f"**Framework:** Nous Research hermes-agent",
+            f"**Model:** {model}",
+            f"**Merkle Root:** `sha256:{merkle_root}`",
+            f"**Timestamp:** {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}",
+            f"",
+            f"---",
+            f"",
+            f"## 💬 Swarm Communication Board Log",
+            f"",
+        ]
+        for log in execution_logs:
+            report_lines.append(f"* **{log['sender']}** ➔ **{log['recipient']}**:")
+            report_lines.append(f"  > {log['content']}")
+            report_lines.append("")
+    else:
+        report_lines = [
+            f"# {pod_name} — Swarm Execution Report",
+            f"",
+            f"**Task:** {user_prompt}",
+            f"**Topology:** Sequential Cascade",
+            f"**Framework:** Nous Research hermes-agent",
+            f"**Model:** {model}",
+            f"**Merkle Root:** `sha256:{merkle_root}`",
+            f"**Timestamp:** {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}",
+            f"",
+            f"---",
+            f"",
+        ]
+        for i, log in enumerate(execution_logs):
+            report_lines.append(f"## Agent {i + 1}: {log['agentName']}")
+            report_lines.append(f"**Specialty:** {log['specialty']}  ")
+            report_lines.append(f"**Time:** {log['timeTakenSeconds']}s  ")
+            report_lines.append(f"")
+            report_lines.append(f"> {log['output']}")
+            report_lines.append(f"")
 
     report_lines.append(f"---")
     report_lines.append(f"")
-    report_lines.append(f"**Consensus:** All {len(execution_logs)} agents completed execution.")
+    report_lines.append(f"**Consensus:** Swarm execution completed successfully.")
     report_lines.append(f"**Merkle Root Attestation:** `sha256:{merkle_root}`")
 
     report_content = "\n".join(report_lines)
@@ -353,7 +492,7 @@ def run_hermes_swarm():
 
     console.print(Panel(
         f"[bold bright_green]🎉 SWARM EXECUTION COMPLETE[/bold bright_green]\n\n"
-        f"Agents Executed: [cyan]{len(execution_logs)}[/cyan]\n"
+        f"Logs Processed: [cyan]{len(execution_logs)}[/cyan]\n"
         f"Merkle Root: [yellow]sha256:{merkle_root[:32]}...[/yellow]\n"
         f"Report saved: [bold cyan]swarm_report_local.md[/bold cyan]",
         border_style="bright_green"

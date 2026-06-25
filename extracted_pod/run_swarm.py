@@ -15,6 +15,7 @@ import sys
 import time
 import hashlib
 import requests
+import asyncio
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -112,6 +113,104 @@ def calculate_merkle_root(logs: list) -> str:
     return leaves[0]
 
 # ---------------------------------------------------------------------------
+# Parallel Mesh Network Topology Classes and Functions
+# ---------------------------------------------------------------------------
+class MeshMessageBroker:
+    def __init__(self, console_obj):
+        self.message_board = []
+        self.queues = {}
+        self.console = console_obj
+        self.active_agents = set()
+
+    def register_agent(self, agent_name):
+        self.queues[agent_name] = asyncio.Queue()
+        self.active_agents.add(agent_name)
+
+    async def send_message(self, sender, recipient, content):
+        msg = {"sender": sender, "content": content}
+        self.message_board.append({
+            "sender": sender,
+            "recipient": recipient,
+            "content": content,
+            "timestamp": time.time()
+        })
+        
+        if recipient == "All":
+            self.console.print(f"  [bold magenta]📣 Broadcast from {sender}:[/bold magenta] [italic]{content[:120]}...[/italic]")
+            for name, q in self.queues.items():
+                if name != sender:
+                    await q.put(msg)
+        else:
+            self.console.print(f"  [bold cyan]✉ {sender} ➔ {recipient}:[/bold cyan] [italic]{content[:120]}...[/italic]")
+            if recipient in self.queues:
+                await self.queues[recipient].put(msg)
+
+
+async def run_mesh_agent_worker(agent_name, agent_cfg, broker, user_prompt, max_turns=3):
+    broker.register_agent(agent_name)
+    agent_specialty = agent_cfg.get("specialty", "General")
+    agent_role = agent_cfg.get("role", "Swarm agent")
+    
+    system_context = (
+        f"You are {agent_name}, an expert AI agent specializing in {agent_specialty}. "
+        f"Your role: {agent_role}. "
+        f"You operate concurrently inside an Asynchronous Mesh Swarm. "
+        f"Be concise, technical, and address fellow agents directly. Max 2 sentences."
+    )
+
+    # Planner starts the discussion
+    if agent_specialty == "Workflow planning":
+        await asyncio.sleep(0.5)
+        intro = f"Swarm initiated. Our objective is: '{user_prompt}'. I propose we compile the codebase specifications and execute security scans. Swarms Consensus Arbiter, please verify compliance when drafts are ready."
+        await broker.send_message(agent_name, "All", intro)
+    
+    turns = 0
+    while turns < max_turns:
+        try:
+            msg = await asyncio.wait_for(broker.queues[agent_name].get(), timeout=4.0)
+            sender = msg["sender"]
+            content = msg["content"]
+            
+            prompt = (
+                f"[System: {system_context}]\n\n"
+                f"Global Swarm Goal: '{user_prompt}'\n"
+                f"Incoming Message from {sender}: '{content}'\n\n"
+                f"Respond to this message with your specific domain expert input. If you are the Consensus Arbiter and all nodes look complete, print 'Consensus Sealed'. Keep it very short."
+            )
+            
+            response_str = query_llm(prompt, system_context)
+            turns += 1
+            
+            if agent_cfg.get("specialty") == "Consensus polling":
+                if "consensus sealed" in response_str.lower() or turns == max_turns:
+                    await broker.send_message(agent_name, "All", f"Consensus Sealed: Swarm objective achieved. Attestation active.")
+                    break
+                else:
+                    await broker.send_message(agent_name, "All", f"Consensus Update: Reviewing message from {sender}.")
+            else:
+                await broker.send_message(agent_name, "Swarms Consensus Arbiter", response_str)
+                
+        except asyncio.TimeoutError:
+            if agent_cfg.get("specialty") == "Consensus polling":
+                await broker.send_message(agent_name, "All", "Consensus Sealed: Swarm finalized by timeout attestation.")
+                break
+            else:
+                await broker.send_message(agent_name, "Swarms Consensus Arbiter", f"{agent_name} reporting specialty checks complete.")
+                break
+
+
+async def run_mesh_swarm_async(agents, user_prompt):
+    broker = MeshMessageBroker(console)
+    tasks = []
+    
+    for agent_cfg in agents:
+        agent_name = agent_cfg.get("name", "Specialist Node")
+        tasks.append(run_mesh_agent_worker(agent_name, agent_cfg, broker, user_prompt))
+        
+    await asyncio.gather(*tasks)
+    return broker.message_board
+
+# ---------------------------------------------------------------------------
 # Main Pipeline
 # ---------------------------------------------------------------------------
 def execute_pipeline():
@@ -161,82 +260,117 @@ def execute_pipeline():
         table.add_row(str(i + 1), a.get("name", "N/A"), a.get("specialty", "N/A"), a.get("productivityBoost", "1.0x"))
     console.print(table)
 
-    logs = []
-    previous_output = ""
+    # Get topology choice
+    console.print("\n[bold white]Choose Swarm Topology:[/bold white]")
+    console.print("  1. [bold cyan]Sequential Cascade[/bold cyan] (Standard linear workflow pipeline)")
+    console.print("  2. [bold cyan]Parallel Mesh Network[/bold cyan] (Asynchronous peer-to-peer broker)")
+    try:
+        topo_choice = input("❯ ").strip()
+    except EOFError:
+        topo_choice = "1"
+    
+    is_mesh = (topo_choice == "2")
     start_time = time.time()
 
-    console.print(f"\n[bold yellow]⚡ Dispatching to {len(agents)} agents via {ENGINE}...[/bold yellow]\n")
+    if is_mesh:
+        console.print(f"\n[bold yellow]⚡ Dispatching to {len(agents)} concurrent Mesh agents via {ENGINE}...[/bold yellow]\n")
+        mesh_logs = asyncio.run(run_mesh_swarm_async(agents, user_prompt))
+        logs = mesh_logs
+    else:
+        console.print(f"\n[bold yellow]⚡ Dispatching to {len(agents)} sequential Cascade agents via {ENGINE}...[/bold yellow]\n")
+        previous_output = ""
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            transient=True,
+        ) as progress:
 
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        transient=True,
-    ) as progress:
+            for idx, agent in enumerate(agents):
+                agent_name = agent.get("name", f"Agent {idx + 1}")
+                agent_specialty = agent.get("specialty", "Operations")
+                agent_role = agent.get("role", "Task execution")
 
-        for idx, agent in enumerate(agents):
-            agent_name = agent.get("name", f"Agent {idx + 1}")
-            agent_specialty = agent.get("specialty", "Operations")
-            agent_role = agent.get("role", "Task execution")
+                task_desc = f"[bold green][{idx + 1}/{len(agents)}][/bold green] {agent_name} executing..."
+                p_task = progress.add_task(description=task_desc, total=100)
 
-            task_desc = f"[bold green][{idx + 1}/{len(agents)}][/bold green] {agent_name} executing..."
-            p_task = progress.add_task(description=task_desc, total=100)
-
-            # Build prompts
-            system_instruction = (
-                f"You are {agent_name}, expert in {agent_specialty}. "
-                f"Your role: {agent_role}. Keep response short, max 2 sentences."
-            )
-
-            if idx == 0:
-                llm_prompt = f"Analyze and plan: \"{user_prompt}\""
-            elif idx == len(agents) - 1:
-                llm_prompt = (
-                    f"Synthesize all previous outputs and seal consensus for: \"{user_prompt}\". "
-                    f"Previous: \"{previous_output[:300]}\""
-                )
-            else:
-                llm_prompt = (
-                    f"As {agent_name}, apply {agent_specialty} to: \"{user_prompt}\". "
-                    f"Previous agent said: \"{previous_output[:200]}\""
+                # Build prompts
+                system_instruction = (
+                    f"You are {agent_name}, expert in {agent_specialty}. "
+                    f"Your role: {agent_role}. Keep response short, max 2 sentences."
                 )
 
-            output = query_llm(llm_prompt, system_instruction)
-            progress.update(p_task, completed=100)
+                if idx == 0:
+                    llm_prompt = f"Analyze and plan: \"{user_prompt}\""
+                elif idx == len(agents) - 1:
+                    llm_prompt = (
+                        f"Synthesize all previous outputs and seal consensus for: \"{user_prompt}\". "
+                        f"Previous: \"{previous_output[:300]}\""
+                    )
+                else:
+                    llm_prompt = (
+                        f"As {agent_name}, apply {agent_specialty} to: \"{user_prompt}\". "
+                        f"Previous agent said: \"{previous_output[:200]}\""
+                    )
 
-            elapsed = time.time() - start_time
-            console.print(f"[bold green]✔[/bold green] [bold cyan]{agent_name}[/bold cyan] [dim]({agent_specialty})[/dim]:")
-            console.print(f"  [italic white]\"{output[:200]}\"[/italic white]\n")
+                output = query_llm(llm_prompt, system_instruction)
+                progress.update(p_task, completed=100)
 
-            logs.append({
-                "agentName": agent_name,
-                "role": agent_role,
-                "specialty": agent_specialty,
-                "output": output,
-                "timeTakenSeconds": round(elapsed, 1),
-                "engine": ENGINE
-            })
+                elapsed = time.time() - start_time
+                console.print(f"[bold green]✔[/bold green] [bold cyan]{agent_name}[/bold cyan] [dim]({agent_specialty})[/dim]:")
+                console.print(f"  [italic white]\"{output[:200]}\"[/italic white]\n")
 
-            previous_output = output
+                logs.append({
+                    "agentName": agent_name,
+                    "role": agent_role,
+                    "specialty": agent_specialty,
+                    "output": output,
+                    "timeTakenSeconds": round(elapsed, 1),
+                    "engine": ENGINE
+                })
+
+                previous_output = output
 
     # Consensus & Merkle
     merkle_root = calculate_merkle_root(logs)
 
     # Save report
-    report_lines = [
-        f"# {pod_name} — Local Swarm Report",
-        f"",
-        f"**Task:** {user_prompt}",
-        f"**Engine:** {ENGINE}",
-        f"**Agents:** {len(logs)}",
-        f"**Merkle Root:** `sha256:{merkle_root}`",
-        f"",
-    ]
-    for i, log in enumerate(logs):
-        report_lines.append(f"## {i+1}. {log['agentName']} ({log['specialty']})")
-        report_lines.append(f"> {log['output']}")
-        report_lines.append("")
-    
-    report_lines.append(f"**Consensus Sealed.** Merkle: `sha256:{merkle_root}`")
+    if is_mesh:
+        report_lines = [
+            f"# {pod_name} — Local Mesh Swarm Report",
+            f"",
+            f"**Task:** {user_prompt}",
+            f"**Engine:** {ENGINE}",
+            f"**Topology:** Parallel Mesh Network",
+            f"**Agents:** {len(logs)}",
+            f"**Merkle Root:** `sha256:{merkle_root}`",
+            f"",
+            f"## 💬 Swarm Communication Board Log",
+            f"",
+        ]
+        for log in logs:
+            report_lines.append(f"* **{log['sender']}** ➔ **{log['recipient']}**:")
+            report_lines.append(f"  > {log['content']}")
+            report_lines.append("")
+        
+        report_lines.append(f"**Consensus Sealed.** Merkle: `sha256:{merkle_root}`")
+    else:
+        report_lines = [
+            f"# {pod_name} — Local Swarm Report",
+            f"",
+            f"**Task:** {user_prompt}",
+            f"**Engine:** {ENGINE}",
+            f"**Topology:** Sequential Cascade",
+            f"**Agents:** {len(logs)}",
+            f"**Merkle Root:** `sha256:{merkle_root}`",
+            f"",
+        ]
+        for i, log in enumerate(logs):
+            report_lines.append(f"## {i+1}. {log['agentName']} ({log['specialty']})")
+            report_lines.append(f"> {log['output']}")
+            report_lines.append("")
+        
+        report_lines.append(f"**Consensus Sealed.** Merkle: `sha256:{merkle_root}`")
 
     with open("swarm_report_local.md", "w", encoding="utf-8") as rf:
         rf.write("\n".join(report_lines))
