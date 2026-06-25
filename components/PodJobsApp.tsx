@@ -4272,7 +4272,9 @@ if __name__ == "__main__":
                     <div className="mt-8 border-t border-slate-800 pt-8 space-y-4 text-left">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <h5 className="font-sans font-bold text-xs text-slate-500 uppercase tracking-widest">
-                          Swarms Array Topology Directory // 12 Nodes Configured
+                          {customPodData?.podName 
+                            ? `${customPodData.podName} Array Topology Directory // 12 Nodes Configured` 
+                            : "Swarms Array Topology Directory // 12 Nodes Configured"}
                         </h5>
                         <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-800/30">
                           ⚡ Click any Node to open Direct Handshake Gateways & edit soul.md, safety.md etc.
