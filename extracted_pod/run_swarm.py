@@ -144,7 +144,10 @@ def execute_pipeline():
         ))
 
     console.print("[bold white]Enter task for the swarm:[/bold white]")
-    user_prompt = input("❯ ").strip()
+    try:
+        user_prompt = input("❯ ").strip()
+    except EOFError:
+        user_prompt = "Optimize basic operations"
     if not user_prompt:
         user_prompt = "Optimize basic operations"
 
@@ -235,7 +238,7 @@ def execute_pipeline():
     
     report_lines.append(f"**Consensus Sealed.** Merkle: `sha256:{merkle_root}`")
 
-    with open("swarm_report_local.md", "w") as rf:
+    with open("swarm_report_local.md", "w", encoding="utf-8") as rf:
         rf.write("\n".join(report_lines))
 
     console.print(Panel(
@@ -248,7 +251,7 @@ def execute_pipeline():
 
 def load_config():
     try:
-        with open("agents_config.json", "r") as f:
+        with open("agents_config.json", "r", encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
         console.print("[bold red]❌ agents_config.json not found. Generate a pod from PodJobs first.[/bold red]")

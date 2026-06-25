@@ -71,12 +71,126 @@ def calculate_merkle_root(logs: list) -> str:
     return leaves[0]
 
 # ---------------------------------------------------------------------------
+# API Key / Provider Configuration Check
+# ---------------------------------------------------------------------------
+def ensure_api_keys():
+    """Verify LLM configuration and offer an interactive wizard if keys are missing."""
+    # Attempt to load local .env file first
+    if os.path.exists(".env"):
+        try:
+            with open(".env", "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        k, v = line.split("=", 1)
+                        os.environ[k.strip()] = v.strip().strip('"').strip("'")
+        except Exception:
+            pass
+
+    # Check if any key is set
+    keys = ["GEMINI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "OPENROUTER_API_KEY", "GOOGLE_API_KEY"]
+    if any(k in os.environ for k in keys):
+        return
+
+    # Check if Hermes configuration file already has a configured provider
+    hermes_config_path = os.path.expanduser("~/.hermes/config.yaml")
+    if os.path.exists(hermes_config_path):
+        try:
+            with open(hermes_config_path, "r", encoding="utf-8") as f:
+                content = f.read()
+                # If they have set a provider and model in config.yaml, we assume it's configured
+                if "provider:" in content and "model:" in content:
+                    return
+        except Exception:
+            pass
+
+    # Display configuration helper panel
+    console.print(Panel(
+        "[bold yellow]⚠️ No LLM API Key detected in Environment or .env file[/bold yellow]\n\n"
+        "To execute the agents with real AI reasoning, you must configure a provider.\n"
+        "You can:\n"
+        "  1. [bold cyan]Create a local .env file[/bold cyan] with your API keys (Gemini, OpenAI, etc.)\n"
+        "  2. [bold cyan]Run the official Hermes setup wizard[/bold cyan]\n"
+        "  3. [bold cyan]Continue in simulation/offline mode[/bold cyan] (fails gracefully)",
+        title="LLM Provider Configuration Required",
+        border_style="yellow"
+    ))
+    
+    try:
+        console.print("[bold white]Choose configuration option (1-3):[/bold white]")
+        choice = input("❯ ").strip()
+    except EOFError:
+        choice = "3"
+    
+    if choice == "1":
+        console.print("\n[bold green]Which API Key would you like to set?[/bold green]")
+        console.print("  1. Gemini (Recommended/Free tier eligible)")
+        console.print("  2. OpenAI")
+        console.print("  3. Anthropic")
+        console.print("  4. OpenRouter")
+        try:
+            key_type = input("❯ ").strip()
+        except EOFError:
+            key_type = "1"
+        
+        env_var = "GEMINI_API_KEY"
+        if key_type == "2":
+            env_var = "OPENAI_API_KEY"
+        elif key_type == "3":
+            env_var = "ANTHROPIC_API_KEY"
+        elif key_type == "4":
+            env_var = "OPENROUTER_API_KEY"
+            
+        try:
+            console.print(f"\n[bold white]Enter your {env_var}:[/bold white]")
+            api_key = input("❯ ").strip()
+        except EOFError:
+            api_key = ""
+            
+        if api_key:
+            try:
+                with open(".env", "a", encoding="utf-8") as f:
+                    f.write(f"\n{env_var}=\"{api_key}\"\n")
+                os.environ[env_var] = api_key
+                console.print(f"\n[bold green]✔ Successfully saved {env_var} to .env file![/bold green]\n")
+            except Exception as e:
+                console.print(f"\n[bold red]❌ Failed to save to .env: {e}[/bold red]\n")
+        else:
+            console.print("\n[yellow]No key entered. Continuing in simulation mode...[/yellow]\n")
+            
+    elif choice == "2":
+        console.print("\n[bold cyan]Starting Hermes setup wizard...[/bold cyan]\n")
+        import subprocess
+        hermes_bin = "hermes"
+        if sys.platform == "win32":
+            local_bin = os.path.join(".", ".venv", "Scripts", "hermes.exe")
+            if os.path.exists(local_bin):
+                hermes_bin = local_bin
+        else:
+            local_bin = os.path.join(".", ".venv", "bin", "hermes")
+            if os.path.exists(local_bin):
+                hermes_bin = local_bin
+                
+        try:
+            subprocess.run([hermes_bin, "setup"], check=True)
+            console.print("\n[bold green]✔ Hermes setup completed successfully![/bold green]\n")
+        except Exception as e:
+            console.print(f"\n[bold red]❌ Could not run Hermes setup: {e}[/bold red]")
+            console.print("You can run it manually in your terminal: [cyan]hermes setup[/cyan]\n")
+            
+    else:
+        console.print("\n[yellow]Continuing in simulation/offline mode.[/yellow]\n")
+
+# ---------------------------------------------------------------------------
 # Main Swarm Orchestrator
 # ---------------------------------------------------------------------------
 def run_hermes_swarm():
+    # Verify API configuration
+    ensure_api_keys()
+
     # Load pod configuration generated by PodJobs
     try:
-        with open("agents_config.json", "r") as f:
+        with open("agents_config.json", "r", encoding="utf-8") as f:
             config = json.load(f)
     except FileNotFoundError:
         console.print("[bold red]❌ agents_config.json not found. Generate a pod from PodJobs first.[/bold red]")
@@ -103,7 +217,10 @@ def run_hermes_swarm():
 
     # Get user task
     console.print("\n[bold white]Enter task for the swarm to execute:[/bold white]")
-    user_prompt = input("❯ ").strip()
+    try:
+        user_prompt = input("❯ ").strip()
+    except EOFError:
+        user_prompt = "Validate code quality and test coverage across the repository"
     if not user_prompt:
         user_prompt = "Provide a comprehensive analysis of the current operational landscape."
 
@@ -231,7 +348,7 @@ def run_hermes_swarm():
     report_lines.append(f"**Merkle Root Attestation:** `sha256:{merkle_root}`")
 
     report_content = "\n".join(report_lines)
-    with open("swarm_report_local.md", "w") as rf:
+    with open("swarm_report_local.md", "w", encoding="utf-8") as rf:
         rf.write(report_content)
 
     console.print(Panel(
