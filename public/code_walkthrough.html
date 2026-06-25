@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PodJobs.ai // Code Walkthrough Simulator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --sidebar-bg: #11141a;
+      --editor-bg: #0d0f14;
+      --border: #1e293b;
+      --accent: #22d3ee;
+      --accent-glow: rgba(34, 211, 238, 0.15);
+      --text: #c8d3f5;
+      --text-dim: #7982a9;
+      --keyword: #c099ff;
+      --string: #c3e88d;
+      --function: #82aaff;
+      --comment: #565f89;
+      --number: #ff966c;
+      --tag: #f7768e;
+      --success: #34d399;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Fira Code', monospace;
+      padding: 20px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .vscode-window {
+      width: 1000px;
+      height: 650px;
+      background-color: var(--editor-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 25px 65px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header Bar */
+    .vs-header {
+      background-color: #161921;
+      height: 40px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      user-select: none;
+    }
+
+    .vs-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .dot-red { background-color: #ef4444; }
+    .dot-yellow { background-color: #eab308; }
+    .dot-green { background-color: #22c55e; }
+
+    .vs-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    /* Workspace Content Area */
+    .vs-workspace {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Sidebar - File Explorer */
+    .vs-sidebar {
+      width: 250px;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 15px 0;
+      user-select: none;
+    }
+
+    .sidebar-section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      padding: 0 20px 10px 20px;
+    }
+
+    .file-item {
+      padding: 8px 20px;
+      font-size: 12px;
+      color: var(--text-dim);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .file-item:hover {
+      background-color: rgba(34, 211, 238, 0.05);
+      color: var(--text);
+    }
+
+    .file-item.active {
+      background-color: rgba(34, 211, 238, 0.1);
+      color: var(--white);
+      border-left: 2px solid var(--accent);
+      font-weight: bold;
+    }
+
+    /* Editor Container */
+    .vs-editor {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background-color: var(--editor-bg);
+    }
+
+    /* Editor Tabs */
+    .editor-tabs {
+      background-color: #12141a;
+      height: 35px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+    }
+
+    .tab {
+      padding: 0 20px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-dim);
+      border-right: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .tab.active {
+      background-color: var(--editor-bg);
+      color: var(--white);
+      border-top: 2px solid var(--accent);
+    }
+
+    /* Editor Content Panel */
+    .editor-content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    /* Highlighting layer */
+    .highlight-box {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      background-color: var(--accent-glow);
+      border-left: 3px solid var(--accent);
+      pointer-events: none;
+      display: none;
+      z-index: 10;
+      box-shadow: 0 0 15px rgba(34, 211, 238, 0.05);
+    }
+
+    /* Status Bar */
+    .vs-statusbar {
+      background-color: #12141a;
+      height: 25px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      font-size: 11px;
+      color: var(--text-dim);
+      user-select: none;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    /* Text Coloring for Syntax Highlighting */
+    .kwd { color: var(--keyword); font-weight: bold; }
+    .str { color: var(--string); }
+    .fn { color: var(--function); }
+    .com { color: var(--comment); font-style: italic; }
+    .num { color: var(--number); }
+    .tag { color: var(--tag); }
+    .wht { color: var(--white); }
+
+    /* Overlay tooltip */
+    .code-explanation {
+      position: absolute;
+      bottom: 40px;
+      right: 40px;
+      max-width: 320px;
+      background: rgba(18, 20, 26, 0.95);
+      border: 1px solid var(--accent);
+      padding: 15px;
+      border-radius: 6px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      line-height: 1.4;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s ease;
+      z-index: 100;
+    }
+
+    .code-explanation.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .explanation-title {
+      font-weight: bold;
+      color: var(--accent);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="vscode-window">
+    <div class="vs-header">
+      <div class="vs-controls">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+      </div>
+      <div class="vs-title">VISUAL STUDIO CODE // CODE WALKTHROUGH</div>
+      <div style="width: 35px;"></div>
+    </div>
+
+    <div class="vs-workspace">
+      <!-- Sidebar Explorer -->
+      <div class="vs-sidebar">
+        <div class="sidebar-section-title">Explorer: PodJobs</div>
+        <div class="file-item active" id="f-route" onclick="showFile('route')">
+          <span>📄</span> route.ts
+        </div>
+        <div class="file-item" id="f-security" onclick="showFile('security')">
+          <span>📄</span> security.ts
+        </div>
+        <div class="file-item" id="f-mcp" onclick="showFile('mcp')">
+          <span>📄</span> mcp-server/index.js
+        </div>
+      </div>
+
+      <!-- Main Editor -->
+      <div class="vs-editor">
+        <div class="editor-tabs">
+          <div class="tab active" id="t-route">route.ts</div>
+          <div class="tab" id="t-security">security.ts</div>
+          <div class="tab" id="t-mcp">index.js</div>
+        </div>
+
+        <div class="editor-content" id="editor-body">
+          <div class="highlight-box" id="highlighter"></div>
+          <pre id="code-content"></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="vs-statusbar">
+      <div class="status-item">
+        <div class="status-dot"></div>
+        <span style="font-family: 'Outfit';">Production Environment Configured</span>
+      </div>
+      <div class="status-item">
+        <span>TypeScript</span> &nbsp;&nbsp;&nbsp; <span>UTF-8</span> &nbsp;&nbsp;&nbsp; <span>Line 1, Col 1</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Explanation HUD -->
+  <div class="code-explanation" id="hud">
+    <div class="explanation-title" id="hud-title">SDK Core Orchestrator</div>
+    <div id="hud-text">Initializing the @google/genai module and setting up multi-agent pipeline.</div>
+  </div>
+
+  <script>
+    const codeData = {
+      route: {
+        title: "route.ts (Google GenAI SDK Integration)",
+        hudTitle: "Official @google/genai SDK Integration",
+        hudText: "We import the next-generation SDK directly into Next.js api routes to drive sequential agent orchestrations, formatting prompts, and capturing structured system instructions.",
+        highlightTop: 18,
+        highlightHeight: 90,
+        content: `
+<span class="com">// app/api/gemini/route.ts</span>
+<span class="kwd">import</span> { <span class="wht">GoogleGenAI</span>, <span class="wht">Type</span> } <span class="kwd">from</span> <span class="str">"@google/genai"</span>;
+<span class="kwd">import</span> { <span class="wht">NextRequest</span>, <span class="wht">NextResponse</span> } <span class="kwd">from</span> <span class="str">"next/server"</span>;
+<span class="kwd">import</span> { <span class="wht">sanitizeInput</span>, <span class="wht">auditOutput</span>, <span class="wht">calculateMerkleRoot</span> } <span class="kwd">from</span> <span class="str">"../../../lib/security"</span>;
+
+<span class="com">// ...</span>
+
+<span class="kwd">const</span> <span class="wht">ai</span> = <span class="kwd">new</span> <span class="fn">GoogleGenAI</span>({
+  <span class="wht">apiKey</span>: <span class="wht">apiKey</span>,
+  <span class="wht">httpOptions</span>: {
+    <span class="wht">headers</span>: { <span class="str">'User-Agent'</span>: <span class="str">'aistudio-build'</span> }
+  }
+});
+
+<span class="com">// ... Sequential Multi-Agent Execution Flow</span>
+<span class="kwd">const</span> <span class="wht">plannerPrompt</span> = <span class="str">\`You are \${agents[0].name}, Lead Swarm Planner. 
+Deconstruct the command: "\${prompt}" for a "\${role}" workstation.\`</span>;
+
+<span class="kwd">const</span> <span class="wht">plannerRes</span> = <span class="kwd">await</span> <span class="wht">ai</span>.<span class="wht">models</span>.<span class="fn">generateContent</span>({
+  <span class="wht">model</span>: <span class="str">"gemini-3.5-flash"</span>,
+  <span class="wht">contents</span>: <span class="wht">plannerPrompt</span>,
+});
+<span class="kwd">const</span> <span class="wht">planResult</span> = <span class="wht">plannerRes</span>.<span class="wht">text</span>?.<span class="fn">trim</span>() || <span class="str">"Execution plan built."</span>;
+
+<span class="com">// ... Data matches downstream sequence ContextMiner -> SuiteDraftsman</span>
+<span class="kwd">const</span> <span class="wht">researcherPrompt</span> = <span class="str">\`You are \${agents[1].name}, Context Miner. 
+Analyze: "\${planResult}" and retrieve vector resources.\`</span>;
+
+<span class="kwd">const</span> <span class="wht">researcherRes</span> = <span class="kwd">await</span> <span class="wht">ai</span>.<span class="wht">models</span>.<span class="fn">generateContent</span>({
+  <span class="wht">model</span>: <span class="str">"gemini-3.5-flash"</span>,
+  <span class="wht">contents</span>: <span class="wht">researcherPrompt</span>,
+});
+<span class="kwd">const</span> <span class="wht">researchResult</span> = <span class="wht">researcherRes</span>.<span class="wht">text</span>?.<span class="fn">trim</span>() || <span class="str">"RAG Grounding complete."</span>;
+`
+      },
+      security: {
+        title: "security.ts (Immutability & Merkle Trees)",
+        hudTitle: "Cryptographic Attestation & Merkle Roots",
+        hudText: "Every log transaction is pairwise-hashed sequentially into a single Merkle Root. This digital attestation secures execution results, verifying that the parallel edge swarm completed untampered.",
+        highlightTop: 110,
+        highlightHeight: 180,
+        content: `
+<span class="com">// lib/security.ts</span>
+<span class="kwd">import</span> { <span class="wht">createHash</span> } <span class="kwd">from</span> <span class="str">"crypto"</span>;
+
+<span class="com">/**
+ * Calculates a SHA-256 Merkle root hash of all agent execution logs
+ * to guarantee consensus immutability and data integrity.
+ */</span>
+<span class="kwd">export function</span> <span class="fn">calculateMerkleRoot</span>(
+  <span class="wht">logs</span>: <span class="wht">Array</span>&lt;{ <span class="wht">agentName</span>: <span class="wht">string</span>; <span class="wht">action</span>: <span class="wht">string</span>; <span class="wht">outputSimulated</span>: <span class="wht">string</span> }&gt;
+): <span class="wht">string</span> {
+  <span class="kwd">if</span> (!<span class="wht">logs</span> || <span class="wht">logs</span>.<span class="wht">length</span> === <span class="num">0</span>) {
+    <span class="kwd">return</span> <span class="fn">createHash</span>(<span class="str">"sha256"</span>).<span class="fn">update</span>(<span class="str">"empty_swarm"</span>).<span class="fn">digest</span>(<span class="str">"hex"</span>);
+  }
+
+  <span class="com">// Step 1: Compute hashes for each leaf node</span>
+  <span class="kwd">let</span> <span class="wht">leafHashes</span> = <span class="wht">logs</span>.<span class="fn">map</span>(<span class="wht">log</span> => {
+    <span class="kwd">const</span> <span class="wht">serialized</span> = <span class="str">\`\${log.agentName}|\${log.action}|\${log.outputSimulated}\`</span>;
+    <span class="kwd">return</span> <span class="fn">createHash</span>(<span class="str">"sha256"</span>).<span class="fn">update</span>(<span class="wht">serialized</span>).<span class="fn">digest</span>(<span class="str">"hex"</span>);
+  });
+
+  <span class="com">// Step 2: Pairwise hash leaves until a single root is reached</span>
+  <span class="kwd">while</span> (<span class="wht">leafHashes</span>.<span class="wht">length</span> > <span class="num">1</span>) {
+    <span class="kwd">const</span> <span class="wht">parentHashes</span>: <span class="wht">string</span>[] = [];
+    <span class="kwd">for</span> (<span class="kwd">let</span> <span class="wht">i</span> = <span class="num">0</span>; <span class="wht">i</span> < &text{leafHashes.length}; <span class="wht">i</span> += <span class="num">2</span>) {
+      <span class="kwd">const</span> <span class="wht">left</span> = <span class="wht">leafHashes</span>[<span class="wht">i</span>];
+      <span class="kwd">const</span> <span class="wht">right</span> = <span class="wht">i</span> + <span class="num">1</span> < <span class="wht">leafHashes</span>.<span class="wht">length</span> ? <span class="wht">leafHashes</span>[<span class="wht">i</span> + <span class="num">1</span>] : <span class="wht">left</span>;
+      <span class="kwd">const</span> <span class="wht">combined</span> = <span class="wht">left</span> + <span class="wht">right</span>;
+      <span class="kwd">const</span> <span class="wht">parent</span> = <span class="fn">createHash</span>(<span class="str">"sha256"</span>).<span class="fn">update</span>(<span class="wht">combined</span>).<span class="fn">digest</span>(<span class="str">"hex"</span>);
+      <span class="wht">parentHashes</span>.<span class="fn">push</span>(<span class="wht">parent</span>);
+    }
+    <span class="wht">leafHashes</span> = <span class="wht">parentHashes</span>;
+  }
+
+  <span class="kwd">return</span> <span class="wht">leafHashes</span>[<span class="num">0</span>];
+}
+`
+      },
+      mcp: {
+        title: "mcp-server/index.js (Model Context Protocol JSON-RPC Server)",
+        hudTitle: "Standardized Model Context Protocol Server",
+        hudText: "Exposes local agent profiles and offline swarm calculations over standard JSON-RPC 2.0 stdio, allowing clients (like Cursor or Claude Desktop) to invoke native swarm tools.",
+        highlightTop: 165,
+        highlightHeight: 190,
+        content: `
+<span class="com">// mcp-server/index.js</span>
+<span class="kwd">const</span> <span class="wht">readline</span> = <span class="fn">require</span>(<span class="str">"readline"</span>);
+<span class="kwd">const</span> <span class="wht">crypto</span> = <span class="fn">require</span>(<span class="str">"crypto"</span>);
+
+<span class="com">// Listen to JSON-RPC over stdio channels</span>
+<span class="wht">rl</span>.<span class="fn">on</span>(<span class="str">"line"</span>, (<span class="wht">line</span>) => {
+  <span class="kwd">if</span> (!<span class="wht">line</span>.<span class="fn">trim</span>()) <span class="kwd">return</span>;
+  <span class="kwd">try</span> {
+    <span class="kwd">const</span> <span class="wht">message</span> = <span class="wht">JSON</span>.<span class="fn">parse</span>(<span class="wht">line</span>);
+    <span class="fn">handleRequest</span>(<span class="wht">message</span>);
+  } <span class="kwd">catch</span> (<span class="wht">err</span>) {
+    <span class="fn">sendError</span>(<span class="kwd">null</span>, -<span class="num">32700</span>, <span class="str">"Parse error: "</span> + <span class="wht">err</span>.<span class="wht">message</span>);
+  }
+});
+
+<span class="kwd">function</span> <span class="fn">handleRequest</span>(<span class="wht">req</span>) {
+  <span class="kwd">const</span> { <span class="wht">jsonrpc</span>, <span class="wht">id</span>, <span class="wht">method</span>, <span class="wht">params</span> } = <span class="wht">req</span>;
+  <span class="kwd">if</span> (<span class="wht">method</span> === <span class="str">"tools/list"</span>) {
+    <span class="fn">sendResponse</span>(<span class="wht">id</span>, {
+      <span class="wht">tools</span>: [
+        {
+          <span class="wht">name</span>: <span class="str">"list_agent_pods"</span>,
+          <span class="wht">description</span>: <span class="str">"List all standard configured agent pods in the workstation"</span>
+        },
+        {
+          <span class="wht">name</span>: <span class="str">"run_swarm_simulation"</span>,
+          <span class="wht">description</span>: <span class="str">"Run parallel 12-agent offline swarm simulation"</span>
+        }
+      ]
+    });
+  }
+}
+`
+      }
+    };
+
+    const codeEl = document.getElementById('code-content');
+    const highlighter = document.getElementById('highlighter');
+    const hud = document.getElementById('hud');
+    const hudTitle = document.getElementById('hud-title');
+    const hudText = document.getElementById('hud-text');
+
+    function highlightSection(top, height) {
+      highlighter.style.top = top + 'px';
+      highlighter.style.height = height + 'px';
+      highlighter.style.display = 'block';
+    }
+
+    function removeHighlight() {
+      highlighter.style.display = 'none';
+    }
+
+    function showFile(key) {
+      // Toggle sidebar active styling
+      document.querySelectorAll('.file-item').forEach(item => item.classList.remove('active'));
+      document.getElementById('f-' + key).classList.add('active');
+
+      // Toggle tab active styling
+      document.querySelectorAll('.tab').forEach(item => item.classList.remove('active'));
+      document.getElementById('t-' + key).classList.add('active');
+
+      // Load code content
+      const fileData = codeData[key];
+      codeEl.innerHTML = fileData.content;
+      
+      // Update HUD information
+      hud.classList.remove('visible');
+      
+      setTimeout(() => {
+        hudTitle.innerText = fileData.hudTitle;
+        hudText.innerText = fileData.hudText;
+        hud.classList.add('visible');
+        highlightSection(fileData.highlightTop, fileData.highlightHeight);
+      }, 500);
+    }
+
+    // Interactive timeline orchestrator for recording
+    window.addEventListener('load', () => {
+      // Step 1: Initialize with route.ts
+      setTimeout(() => {
+        showFile('route');
+      }, 1000);
+
+      // Step 2: Transition to security.ts after 10 seconds
+      setTimeout(() => {
+        showFile('security');
+      }, 11000);
+
+      // Step 3: Transition to mcp-server/index.js after 21 seconds
+      setTimeout(() => {
+        showFile('mcp');
+      }, 21000);
+
+      // End of showcase indicators
+      setTimeout(() => {
+        hudTitle.innerText = "Code Review Complete";
+        hudText.innerText = "All three core modules are certified secure, compliant, and standards-ready under Project PJ.";
+        removeHighlight();
+      }, 31000);
+    });
+  </script>
+</body>
+</html>

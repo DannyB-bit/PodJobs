@@ -6,7 +6,8 @@
 **Executed by:** Antigravity (Advanced Agentic System)  
 **Timestamp:** 2026-06-21T15:10:00-04:00  
 **Status:** **`PASSED - PRODUCTION LEVEL CERTIFIED`**  
-**Verification Token:** `antigravity_audit_seal:0208062c6c736a5f6ef03` (SHA-256 Verified Attestation)
+**Verification Token:** `antigravity_audit_seal:0208062c6c736a5f6ef03` (SHA-256 Verified Attestation)  
+**On-Chain Walkthrough NFT:** [Tezos Objkt Token #94](https://objkt.com/tokens/KT1L2gY2BUE2gcydLUXLzSAYwAvriYvZMBQ8/94) (CC-BY Certified Attestation)  
 
 ---
 

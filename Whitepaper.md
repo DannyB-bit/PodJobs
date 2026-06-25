@@ -5,6 +5,7 @@
 **Architect & Author:** Devs One — Danny Bouldiez  
 **Platform:** Google AI Studio, Google Antigravity, and Nous Research Hermes Agent  
 **Build Status:** Deployed & Live  
+**On-Chain Attestation Video NFT:** [Tezos Objkt Token #94](https://objkt.com/tokens/KT1L2gY2BUE2gcydLUXLzSAYwAvriYvZMBQ8/94)  
 
 ---
 

@@ -9,7 +9,7 @@
 [![Gemini 3.5 Flash](https://img.shields.io/badge/Powered%20By-Gemini%203.5%20Flash-blue?style=for-the-badge&logo=google)](https://ai.google.dev/)
 [![Model Context Protocol](https://img.shields.io/badge/Protocol-MCP-cyan?style=for-the-badge)](https://modelcontextprotocol.io/)
 
-📄 **[Download the Official Project PJ Whitepaper (PDF)](public/Whitepaper.pdf)** | 🌐 **[View Live Web App](https://podjobs.vercel.app)** | 🕵️‍♂️ **[View Agentic Audit & System Review](./AUDIT.md)**
+📄 **[Download the Official Project PJ Whitepaper (PDF)](public/Whitepaper.pdf)** | 🌐 **[View Live Web App](https://podjobs.vercel.app)** | 🌌 **[On-Chain Walkthrough NFT](https://objkt.com/tokens/KT1L2gY2BUE2gcydLUXLzSAYwAvriYvZMBQ8/94)** | 🕵️‍♂️ **[View Agentic Audit & System Review](./AUDIT.md)**
 
 PodJobs is a complete, production-ready **Multi-Agent Swarm Orchestration Platform** built for the **AI Agents: Intensive Vibe Coding Capstone Project**. 
 
@@ -164,3 +164,14 @@ node bin/validate-live-api.js
 | **Security Features** | [lib/security.ts](./lib/security.ts) | Injection filters, NeMo Safety Auditor, Cryptographic Merkle Root |
 | **Agent Skills** | [bin/podjobs-cli.js](./bin/podjobs-cli.js) | CLI interface to query, list, inspect, and run swarms |
 | **Antigravity / Deploy** | [AUDIT.md](./AUDIT.md) | Signed Forensic Data Audit and Evaluation verifying structural integrity |
+
+---
+
+## ⚖️ License
+
+This project is dual-licensed under:
+- **Creative Commons Attribution 4.0 International (CC-BY 4.0)** (required for the Kaggle Capstone Project submission).
+- **Apache License 2.0 (Apache-2.0)**.
+
+See the [LICENSE](./LICENSE) file for details.
+

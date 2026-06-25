@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PodJobs.ai // Real Offline Swarm Execution</title>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050608;
+      --terminal-bg: #0c0d12;
+      --border: #1e293b;
+      --text: #a7f3d0;
+      --white: #ffffff;
+      --grey: #64748b;
+      --cyan: #22d3ee;
+      --yellow: #fbbf24;
+      --green: #34d399;
+      --red: #f87171;
+      --magenta: #f472b6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Courier Prime', monospace;
+      padding: 30px;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    .terminal-window {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: var(--terminal-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+
+    .terminal-header {
+      background-color: #12151f;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .dot-red { background-color: #ef4444; }
+    .dot-yellow { background-color: #eab308; }
+    .dot-green { background-color: #22c55e; }
+
+    .window-title {
+      font-size: 11px;
+      color: var(--grey);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .terminal-body {
+      padding: 25px;
+      min-height: 700px;
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+
+    .prompt {
+      color: var(--cyan);
+    }
+
+    .command-text {
+      color: var(--white);
+      font-weight: bold;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 15px;
+      background-color: var(--text);
+      margin-left: 2px;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    /* ANSI Colors Simulation */
+    .c-green { color: var(--green); }
+    .c-yellow { color: var(--yellow); }
+    .c-blue { color: #60a5fa; }
+    .c-magenta { color: var(--magenta); }
+    .c-cyan { color: var(--cyan); }
+    .c-red { color: var(--red); }
+    .c-dim { color: var(--grey); }
+    .c-bright { color: var(--white); font-weight: bold; }
+    
+    .scroll-indicator {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(18, 21, 31, 0.9);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      color: var(--yellow);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--yellow);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.3; }
+      50% { opacity: 1; }
+      100% { opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scroll-indicator">
+    <div class="pulse-dot"></div>
+    <span>OFFLINE SWARM RUNNING</span>
+  </div>
+
+  <div class="terminal-window">
+    <div class="terminal-header">
+      <div class="window-controls">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+      </div>
+      <div class="window-title">POWERSHELL // OFFLINE SWARM DEMO</div>
+      <div style="width: 35px;"></div>
+    </div>
+    <div class="terminal-body" id="console"></div>
+  </div>
+
+  <script>
+    const consoleEl = document.getElementById('console');
+    
+    // Command simulation lines database
+    const script = [
+      // 1. cd extracted_pod
+      { action: 'type', text: 'cd extracted_pod\n' },
+      { action: 'print', delay: 100, text: 'PS K:\\Cpastone-Project-kaggle5day\\extracted_pod> ' },
+      
+      // 2. python run_swarm.py
+      { action: 'type_raw', text: 'python run_swarm.py\n' },
+      { action: 'print', delay: 400, text: `
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ <span class="c-bright c-green">🚀 Starting Local Swarm: Aegis Trial Synthesis & Biotech Execution Pod</span>      │
+│ Data Privacy Guarantee: 100% OFFLINE. Target LLM: llama3 at                 │
+│ http://localhost:11434                                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+<span class="c-bright">Specify operational prompt or workload target to dispatch to Swarm:</span>
+` },
+      
+      // 3. Type user prompt
+      { action: 'type_prompt', text: '❯ Analyze clinical trial safety metrics\n' },
+      { action: 'print', delay: 500, text: `
+                    <span class="c-cyan">🗂️ Swarm Configuration Schema (12 Agents)</span>                   
+┌────┬───────────────────────┬───────────────────────┬────────────────────────┐
+│    │                       │ Expert domain &       │ Productivity           │
+│ ID │ Specialist Agent Name │ Specialty             │ Multiplier             │
+├────┼───────────────────────┼───────────────────────┼────────────────────────┤
+│ 1  │ <span class="c-green">Protocol Architecture</span> │ Protocol drafting &   │ 18x faster drafting    │
+│    │ <span class="c-green">Engine</span>                │ optimization          │                        │
+│ 2  │ <span class="c-green">Cohort Synthesizer &</span>  │ High-throughput       │ 95% reduced screening  │
+│    │ <span class="c-green">Screener</span>              │ patient matching      │ time                   │
+│ 3  │ <span class="c-green">Global Regulatory</span>     │ Regulatory compliance │ Instant cross-border   │
+│    │ <span class="c-green">Sentinel</span>              │ validation            │ audit                  │
+│ 4  │ <span class="c-green">Multi-Omics Biomarker</span> │ Biomarker therapeutic │ 40x faster multi-omics │
+│    │ <span class="c-green">Evaluator</span>             │ tracking              │ analysis               │
+│ 5  │ <span class="c-green">Bioethical Consent</span>    │ Informed consent      │ Zero-risk ethical      │
+│    │ <span class="c-green">Assurer</span>               │ auditing              │ oversight              │
+│ 6  │ <span class="c-green">Pharmacovigilance</span>     │ Adverse event         │ Real-time safety       │
+│    │ <span class="c-green">Real-Time Monitor</span>     │ detection             │ alerting               │
+│ 7  │ <span class="c-green">eCRF Data Auditor</span>     │ Query generation &    │ 12x faster query       │
+│    │                       │ data cleaning         │ resolution             │
+│ 8  │ <span class="c-green">Biostatistical</span>        │ Biostatistics & SAP   │ 8x reduction in        │
+│    │ <span class="c-green">Inference Modeler</span>     │ execution             │ statistical error      │
+│ 9  │ <span class="c-green">IP Logistics & Supply</span> │ Clinical supply-chain │ Zero drug stock-outs   │
+│    │ <span class="c-green">Tracker</span>               │ optimization          │                        │
+│ 10 │ <span class="c-green">CSR Synthesizer &</span>     │ Medical report        │ 15x faster report      │
+│    │ <span class="c-green">Medical Writer</span>        │ generation            │ authoring              │
+│ 11 │ <span class="c-green">Global Trial Site</span>     │ Trial feasibility     │ 30% faster site        │
+│    │ <span class="c-green">Strategist</span>            │ assessment            │ activation             │
+│ 12 │ <span class="c-green">Inbound Investigator</span>  │ Investigator helpdesk │ Instant multi-lingual  │
+│    │ <span class="c-green">Support Hub</span>           │ automation            │ support                │
+└────┴───────────────────────┴───────────────────────┴────────────────────────┘
+
+<span class="c-yellow">⌛ Dispatched workload to agents. Sequencing Merkle cascade...</span>
+
+` },
+      
+      // 4. Sequence agents
+      { action: 'print', delay: 700, text: `<span class="c-green">✔</span> <span class="c-cyan">Protocol Architecture Engine</span> <span class="c-dim">(Protocol drafting & optimization)</span>:
+  <span class="c-dim">"[Static Simulation Mode] Processed locally. Identified specialty workflows successfully."</span>
+
+` },
+      { action: 'print', delay: 500, text: `<span class="c-green">✔</span> <span class="c-cyan">Cohort Synthesizer & Screener</span> <span class="c-dim">(High-throughput patient matching)</span>:
+  <span class="c-dim">"[Static Simulation Mode] Processed locally. Identified specialty workflows successfully."</span>
+
+` },
+      { action: 'print', delay: 500, text: `<span class="c-green">✔</span> <span class="c-cyan">Global Regulatory Sentinel</span> <span class="c-dim">(Regulatory compliance validation)</span>:
+  <span class="c-dim">"[Static Simulation Mode] Processed locally. Identified specialty workflows successfully."</span>
+
+` },
+      { action: 'print', delay: 500, text: `<span class="c-green">✔</span> <span class="c-cyan">Multi-Omics Biomarker Evaluator</span> <span class="c-dim">(Biomarker therapeutic tracking)</span>:
+  <span class="c-dim">"[Static Simulation Mode] Processed locally. Identified specialty workflows successfully."</span>
+
+` },
+      { action: 'print', delay: 500, text: `<span class="c-green">✔</span> <span class="c-cyan">Bioethical Consent Assurer</span> <span class="c-dim">(Informed consent auditing)</span>:
+  <span class="c-dim">"[Static Simulation Mode] Processed locally. Identified specialty workflows successfully."</span>
+
+` },
+      { action: 'print', delay: 550, text: `<span class="c-green">✔</span> <span class="c-cyan">Pharmacovigilance Real-Time Monitor</span> <span class="c-dim">(Adverse event detection)</span>:
+  <span class="c-dim">"[Static Simulation Mode] Processed locally. Identified specialty workflows successfully."</span>
+
+` },
+      { action: 'print', delay: 550, text: `<span class="c-green">✔</span> <span class="c-cyan">eCRF Data Auditor</span> <span class="c-dim">(Query generation & data cleaning)</span>:
+  <span class="c-dim">"[Static Simulation Mode] Processed locally. Identified specialty workflows successfully."</span>
+
+` },
+      { action: 'print', delay: 550, text: `<span class="c-green">✔</span> <span class="c-cyan">Biostatistical Inference Modeler</span> <span class="c-dim">(Biostatistics & SAP execution)</span>:
+  <span class="c-dim">"[Static Simulation Mode] Processed locally. Identified specialty workflows successfully."</span>
+
+` },
+      { action: 'print', delay: 600, text: `<span class="c-green">✔</span> <span class="c-cyan">IP Logistics & Supply Tracker</span> <span class="c-dim">(Clinical supply-chain optimization)</span>:
+  <span class="c-dim">"[Static Simulation Mode] Processed locally. Identified specialty workflows successfully."</span>
+
+` },
+      { action: 'print', delay: 600, text: `<span class="c-green">✔</span> <span class="c-cyan">CSR Synthesizer & Medical Writer</span> <span class="c-dim">(Medical report generation)</span>:
+  <span class="c-dim">"[Static Simulation Mode] Processed locally. Identified specialty workflows successfully."</span>
+
+` },
+      { action: 'print', delay: 600, text: `<span class="c-green">✔</span> <span class="c-cyan">Global Trial Site Strategist</span> <span class="c-dim">(Trial feasibility assessment)</span>:
+  <span class="c-dim">"[Static Simulation Mode] Processed locally. Identified specialty workflows successfully."</span>
+
+` },
+      { action: 'print', delay: 650, text: `<span class="c-green">✔</span> <span class="c-cyan">Inbound Investigator Support Hub</span> <span class="c-dim">(Investigator helpdesk automation)</span>:
+  <span class="c-dim">"[Static Simulation Mode] Processed locally. Identified specialty workflows successfully."</span>
+
+` },
+      { action: 'print', delay: 800, text: `<span class="c-yellow">⌛ Executing Final Swarm Consensus Voting & Synthesis...</span>
+` },
+      { action: 'print', delay: 1500, text: `┌─────────────────────────────────────────────────────────────────────────────┐
+│ <span class="c-bright c-green">🎉 SUCCESS: Local Swarm Execution Completed Successfully</span>                    │
+│                                                                             │
+│ Consensus Brief compiled and saved locally to: <span class="c-cyan">swarm_report_local.md</span>!       │
+└─────────────────────────────────────────────────────────────────────────────┘
+` }
+    ];
+
+    let currentStep = 0;
+
+    function renderPrompt(promptPath) {
+      const promptSpan = document.createElement('span');
+      promptSpan.className = 'prompt';
+      promptSpan.innerText = promptPath || 'PS K:\\Cpastone-Project-kaggle5day> ';
+      
+      const cmdTextSpan = document.createElement('span');
+      cmdTextSpan.className = 'command-text';
+      
+      const cursorSpan = document.createElement('span');
+      cursorSpan.className = 'cursor';
+      
+      consoleEl.appendChild(promptSpan);
+      consoleEl.appendChild(cmdTextSpan);
+      consoleEl.appendChild(cursorSpan);
+      
+      return { cmdTextSpan, cursorSpan };
+    }
+
+    function executeNextStep() {
+      if (currentStep >= script.length) {
+        document.querySelector('.scroll-indicator').innerHTML = "<span>SWARM ATTEDATION SEALED</span>";
+        return;
+      }
+
+      const step = script[currentStep];
+      currentStep++;
+
+      if (step.action === 'type') {
+        const { cmdTextSpan, cursorSpan } = renderPrompt();
+        let charIndex = 0;
+        
+        function typeChar() {
+          if (charIndex < step.text.length) {
+            cmdTextSpan.innerText += step.text[charIndex];
+            charIndex++;
+            setTimeout(typeChar, 60);
+          } else {
+            cursorSpan.remove();
+            consoleEl.innerHTML += '\n';
+            executeNextStep();
+          }
+        }
+        setTimeout(typeChar, 500);
+      } else if (step.action === 'type_raw') {
+        const { cmdTextSpan, cursorSpan } = renderPrompt('PS K:\\Cpastone-Project-kaggle5day\\extracted_pod> ');
+        let charIndex = 0;
+        
+        function typeChar() {
+          if (charIndex < step.text.length) {
+            cmdTextSpan.innerText += step.text[charIndex];
+            charIndex++;
+            setTimeout(typeChar, 60);
+          } else {
+            cursorSpan.remove();
+            consoleEl.innerHTML += '\n';
+            executeNextStep();
+          }
+        }
+        setTimeout(typeChar, 500);
+      } else if (step.action === 'type_prompt') {
+        const promptSpan = document.createElement('span');
+        promptSpan.className = 'command-text';
+        
+        const cursorSpan = document.createElement('span');
+        cursorSpan.className = 'cursor';
+        
+        consoleEl.appendChild(promptSpan);
+        consoleEl.appendChild(cursorSpan);
+
+        let charIndex = 0;
+        function typeChar() {
+          if (charIndex < step.text.length) {
+            promptSpan.innerText += step.text[charIndex];
+            charIndex++;
+            setTimeout(typeChar, 60);
+          } else {
+            cursorSpan.remove();
+            consoleEl.innerHTML += '\n';
+            executeNextStep();
+          }
+        }
+        setTimeout(typeChar, 300);
+      } else if (step.action === 'print') {
+        setTimeout(() => {
+          consoleEl.innerHTML += step.text;
+          window.scrollTo(0, document.body.scrollHeight);
+          executeNextStep();
+        }, step.delay || 100);
+      }
+    }
+
+    // Start simulation after 2.0 seconds
+    setTimeout(executeNextStep, 2000);
+  </script>
+</body>
+</html>

@@ -440,7 +440,8 @@ Analysis:
     });
 
     if (action === "generate-pod") {
-      const gptPrompt = `You are an elite, PhD-level organizational AI architect.
+      try {
+        const gptPrompt = `You are an elite, PhD-level organizational AI architect.
 The user wants to transition a human role into a modern "POD" of 12 highly specialized AI agents orchestrated by 1 single human.
 Human Role: "${role}"
 Industry/Sector: "${sector || "General Services"}"
@@ -474,74 +475,85 @@ Output JSON Schema:
 
 Provide exactly 12 specialized agents inside the "agents" array, each having the precise keys specified. Inside the "workflowSteps" array, provide 4 sequential steps mapping a standard complex operational challenge. Use valid JSON formatting. Do not wrap code blocks in any text other than the JSON output.`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: gptPrompt,
-        config: {
-          responseMimeType: "application/json",
-        }
-      });
-
-      const responseText = response.text || "";
-      const parsedData = JSON.parse(responseText.trim());
-
-      // Enrich the live-generated agents with pronouns, gateway routers, and five Merkle markdown configuration files
-      if (parsedData && Array.isArray(parsedData.agents)) {
-        const pronounList = ["She/They", "He/Him", "She/Her", "They/Them", "He/They", "It/Its", "She/They", "He/Him", "She/Her", "They/Them", "It/Its", "They/Them"];
-        const onboarding = onboardingUser || {
-          userName: "Director",
-          organization: "Autonomous Swarm Org",
-          goal: "Optimize business intelligence and parallel agent tasks"
-        };
-
-        parsedData.agents = parsedData.agents.map((agent: any, index: number) => {
-          const pronouns = pronounList[index % pronounList.length] || "They/Them";
-          const routerAddress = `router://openclaw/node-${index + 1}`;
-          const files = getMicroFilesForAgent(
-            agent.name || `Specialist-${index + 1}`,
-            agent.role || "Assigned task node",
-            agent.specialty || "Swarm task execution",
-            pronouns,
-            routerAddress
-          );
-
-          const hermesConfig = {
-            agentId: `hermes-${agent.id || index + 1}`,
-            frameworkVersion: "v0.4.2",
-            modelBrain: "Gemini 3.5 Flash (Google Free Tier Eligible)",
-            temperature: 0.7,
-            isFreeTier: true,
-            onboarding: {
-              orchestrator: onboarding.userName,
-              orgName: onboarding.organization,
-              strategicGoal: onboarding.goal
-            },
-            systemInstructions: `Executing via Hermes Agent framework. Mode: Continuous Consensus of ${agent.name || `Specialist-${index + 1}`}. Connected to human conductor ${onboarding.userName} of ${onboarding.organization}. Specialty: ${agent.specialty || "Swarm task execution"}.`
-          };
-
-          return {
-            ...agent,
-            id: agent.id || `g${index + 1}`,
-            pronouns,
-            routerAddress,
-            soulMd: files.soul,
-            agentsMd: files.agents,
-            memoryMd: files.memory,
-            safetyMd: files.safety,
-            securityMd: files.security,
-            hermesConfig
-          };
+        const response = await ai.models.generateContent({
+          model: "gemini-3.5-flash",
+          contents: gptPrompt,
+          config: {
+            responseMimeType: "application/json",
+          }
         });
 
-        parsedData.hermesOnboarding = {
-          user: onboarding.userName,
-          org: onboarding.organization,
-          broadGoal: onboarding.goal,
-          orchestratedWithHermes: true
-        };
-      }
+        const responseText = response.text || "";
+        let cleanedText = responseText.trim();
+        if (cleanedText.startsWith("```")) {
+          cleanedText = cleanedText.replace(/^```(?:json)?\s*/i, "");
+        }
+        if (cleanedText.endsWith("```")) {
+          cleanedText = cleanedText.replace(/\s*```$/, "");
+        }
+        const parsedData = JSON.parse(cleanedText.trim());
 
-      return NextResponse.json(parsedData);
+        // Enrich the live-generated agents with pronouns, gateway routers, and five Merkle markdown configuration files
+        if (parsedData && Array.isArray(parsedData.agents)) {
+          const pronounList = ["She/They", "He/Him", "She/Her", "They/Them", "He/They", "It/Its", "She/They", "He/Him", "She/Her", "They/Them", "It/Its", "They/Them"];
+          const onboarding = onboardingUser || {
+            userName: "Director",
+            organization: "Autonomous Swarm Org",
+            goal: "Optimize business intelligence and parallel agent tasks"
+          };
+
+          parsedData.agents = parsedData.agents.map((agent: any, index: number) => {
+            const pronouns = pronounList[index % pronounList.length] || "They/Them";
+            const routerAddress = `router://openclaw/node-${index + 1}`;
+            const files = getMicroFilesForAgent(
+              agent.name || `Specialist-${index + 1}`,
+              agent.role || "Assigned task node",
+              agent.specialty || "Swarm task execution",
+              pronouns,
+              routerAddress
+            );
+
+            const hermesConfig = {
+              agentId: `hermes-${agent.id || index + 1}`,
+              frameworkVersion: "v0.4.2",
+              modelBrain: "Gemini 3.5 Flash (Google Free Tier Eligible)",
+              temperature: 0.7,
+              isFreeTier: true,
+              onboarding: {
+                orchestrator: onboarding.userName,
+                orgName: onboarding.organization,
+                strategicGoal: onboarding.goal
+              },
+              systemInstructions: `Executing via Hermes Agent framework. Mode: Continuous Consensus of ${agent.name || `Specialist-${index + 1}`}. Connected to human conductor ${onboarding.userName} of ${onboarding.organization}. Specialty: ${agent.specialty || "Swarm task execution"}.`
+            };
+
+            return {
+              ...agent,
+              id: agent.id || `g${index + 1}`,
+              pronouns,
+              routerAddress,
+              soulMd: files.soul,
+              agentsMd: files.agents,
+              memoryMd: files.memory,
+              safetyMd: files.safety,
+              securityMd: files.security,
+              hermesConfig
+            };
+          });
+
+          parsedData.hermesOnboarding = {
+            user: onboarding.userName,
+            org: onboarding.organization,
+            broadGoal: onboarding.goal,
+            orchestratedWithHermes: true
+          };
+        }
+
+        return NextResponse.json(parsedData);
+      } catch (err: any) {
+        console.warn("Live generate-pod failed, falling back to local fallback generator:", err.message || err);
+        return NextResponse.json(generateFallbackPod(role, sector, onboardingUser));
+      }
     } 
 
     if (action === "simulate-run") {

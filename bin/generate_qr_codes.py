@@ -47,3 +47,4 @@ def generate_qr_with_logo(link_url, logo_path, output_path):
 if __name__ == "__main__":
     generate_qr_with_logo("https://github.com/DannyB-bit/PodJobs", "assets/github_logo.png", "assets/github_qr.png")
     generate_qr_with_logo("https://podjobs.vercel.app/", "assets/vercel_logo.png", "assets/vercel_qr.png")
+    generate_qr_with_logo("https://objkt.com/tokens/KT1L2gY2BUE2gcydLUXLzSAYwAvriYvZMBQ8/94", "assets/logo.png", "assets/nft_qr.png")

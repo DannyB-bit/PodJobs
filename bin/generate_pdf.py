@@ -146,26 +146,30 @@ def parse_markdown_to_flowables(filepath, styles):
 
         # Custom QR Codes row layout
         if stripped == '[QR_CODES_ROW]':
-            qr_w = 120
-            qr_h = 120
+            qr_w = 90
+            qr_h = 90
             github_path = "assets/github_qr.png"
             vercel_path = "assets/vercel_qr.png"
+            nft_path = "assets/nft_qr.png"
             
-            if os.path.exists(github_path) and os.path.exists(vercel_path):
+            if os.path.exists(github_path) and os.path.exists(vercel_path) and os.path.exists(nft_path):
                 github_img = Image(github_path, width=qr_w, height=qr_h)
                 vercel_img = Image(vercel_path, width=qr_w, height=qr_h)
+                nft_img = Image(nft_path, width=qr_w, height=qr_h)
                 
                 github_img.hAlign = 'CENTER'
                 vercel_img.hAlign = 'CENTER'
+                nft_img.hAlign = 'CENTER'
                 
-                github_label = Paragraph("<font face='Helvetica-Bold' size='9' color='#0F172A'>GitHub: DannyB-bit/PodJobs</font>", styles['MetadataCentred'])
-                vercel_label = Paragraph("<font face='Helvetica-Bold' size='9' color='#0F172A'>Live Website: podjobs.vercel.app</font>", styles['MetadataCentred'])
+                github_label = Paragraph("<font face='Helvetica-Bold' size='8' color='#0F172A'>GitHub: DannyB-bit/PodJobs</font>", styles['MetadataCentred'])
+                vercel_label = Paragraph("<font face='Helvetica-Bold' size='8' color='#0F172A'>Live Website: podjobs.vercel.app</font>", styles['MetadataCentred'])
+                nft_label = Paragraph("<font face='Helvetica-Bold' size='8' color='#0F172A'>On-Chain Walkthrough NFT</font>", styles['MetadataCentred'])
                 
                 t_data = [
-                    [github_img, vercel_img],
-                    [github_label, vercel_label]
+                    [github_img, vercel_img, nft_img],
+                    [github_label, vercel_label, nft_label]
                 ]
-                t = Table(t_data, colWidths=[252, 252])
+                t = Table(t_data, colWidths=[168, 168, 168])
                 t.setStyle(TableStyle([
                     ('ALIGN', (0,0), (-1,-1), 'CENTER'),
                     ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
