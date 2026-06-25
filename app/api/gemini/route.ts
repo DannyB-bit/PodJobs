@@ -340,6 +340,24 @@ export async function POST(req: NextRequest) {
     // Check if key is placeholder or default
     const isKeyConfigured = apiKey && apiKey !== "MY_GEMINI_API_KEY" && apiKey.trim().length > 10;
 
+    // --- Security Gate: Sanitize all user-provided input ---
+    const fieldsToSanitize = [
+      { name: "userMessage", value: userMessage },
+      { name: "prompt", value: prompt },
+      { name: "role", value: role }
+    ];
+    for (const field of fieldsToSanitize) {
+      if (field.value && typeof field.value === "string") {
+        const check = sanitizeInput(field.value);
+        if (!check.safe) {
+          return NextResponse.json(
+            { error: check.reason || "Input rejected by security filter.", isSecurityBlock: true },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
     // Direct cognitive handshake chat route
     if (action === "chat-agent") {
       const systemPrompt = `You are ${agentName}, an advanced specialized AI Agent representing a ${role || "Core Node"}, expert in ${specialty || "Swarm Intelligence"}.
