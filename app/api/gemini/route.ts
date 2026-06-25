@@ -24,7 +24,7 @@ Believes that "The impossible is just code waiting to be written." This node str
 ### Orchestration Topology
 - **Parent Node**: Merkle Tree Swarm Root Controller (Direct Command Line Interface)
 - **Local Gateway Registry**: OpenClaw Node Swarm Controller
-- **Consensus Scheme**: Bayesian Agreement voting matrix with 12 peer nodes
+- **Consensus Scheme**: Sequential pipeline verification with Merkle integrity attestation across 12 peer nodes
 
 ### Downstream Ingress/Egress Routers
 - **Ingress**: Listening securely on TLS Port 8083 router channel
@@ -42,7 +42,7 @@ Believes that "The impossible is just code waiting to be written." This node str
 - Retains up to 40,000 contextual tokens of direct user message streams.
 - Refers queries dynamically to the localized RAG Hub when matching terms of context are queried.`,
 
-    safety: `# NVIDIA NeMo Safety Guardrails Constraint Schema
+    safety: `# Safety Guardrails Constraint Schema
 ## Node Alignment Class: High-Fidelity Domain Authority
 
 ### Guardrail Directives
@@ -88,7 +88,7 @@ function generateFallbackPod(role: string, sector: string, onboardingUser?: any)
       { id: "l9", name: "Adversarial Stress Tester", role: "Simulates opposing counsel objections and tests weaknesses in argument logic", specialty: "Stressor simulation", productivityBoost: "30% more robust briefs", icon: "Zap", status: "idle" },
       { id: "l10", name: "Consolidated Case Summarizer", role: "Merges deep research and trial filings into an executive client briefing", specialty: "Summary briefings", productivityBoost: "Instant brief drafts", icon: "Activity", status: "idle" },
       { id: "l11", name: "Ethics Committee Validator", role: "Verifies state bar directives, professional conduct rules and compliance", specialty: "Ethics alignment", productivityBoost: "100% ethics pass rate", icon: "Scale", status: "idle" },
-      { id: "l12", name: "Consensus Verdict Arbiter", role: "Polls other agents via a Bayesian jury matrix to pick the safest legal strategy", specialty: "Consensus voting", productivityBoost: "Unified battleplan", icon: "Cpu", status: "idle" }
+      { id: "l12", name: "Consensus Verdict Arbiter", role: "Polls other agents via a structured verification matrix to pick the safest legal strategy", specialty: "Consensus voting", productivityBoost: "Unified battleplan", icon: "Cpu", status: "idle" }
     ];
     workflowSteps = [
       { title: "Arguments Blueprinting", executor: "Arguments Blueprint Planner", description: "Deconstructs filings into active logic branches." },
@@ -109,7 +109,7 @@ function generateFallbackPod(role: string, sector: string, onboardingUser?: any)
       { id: "m9", name: "Pathology Drift Predictor", role: "Stress tests treatment models against sudden physiological or medical anomalies", specialty: "Drift forecasting", productivityBoost: "25% safer medical paths", icon: "Zap", status: "idle" },
       { id: "m10", name: "Consolidated Health Reporter", role: "Synchronizes genetic, vital, and literature logs into a single summary page", specialty: "Summary briefs", productivityBoost: "Instant briefing cards", icon: "Activity", status: "idle" },
       { id: "m11", name: "Medical Ethics Inspector", role: "Aligns therapeutic suggestions with contemporary healthcare ethical rules", specialty: "Ethics review", productivityBoost: "Secure practice bounds", icon: "Scale", status: "idle" },
-      { id: "m12", name: "Consensus Medicine Director", role: "Drives final triage agreement via a Bayesian clinical consensus voting model", specialty: "Consensus polling", productivityBoost: "Unified treatment plan", icon: "Cpu", status: "idle" }
+      { id: "m12", name: "Consensus Medicine Director", role: "Drives final triage agreement via a structured clinical verification model", specialty: "Consensus polling", productivityBoost: "Unified treatment plan", icon: "Cpu", status: "idle" }
     ];
     workflowSteps = [
       { title: "Pathway Mapping", executor: "Diagnostic Tree Planner", description: "Decomposes inputs into vital paths." },
@@ -151,7 +151,7 @@ function generateFallbackPod(role: string, sector: string, onboardingUser?: any)
       { id: "f9", name: "Liquidity Stress Modeler", role: "Simulates black-swan interest moves, retail runs and algorithmic liquidations", specialty: "Black-swan testing", productivityBoost: "30% more resilient ledger", icon: "Zap", status: "idle" },
       { id: "f10", name: "Consolidated Portfolio Reporter", role: "Fuses active trades, yields, and compliance status into index briefing files", specialty: "Digest compiling", productivityBoost: "Instant ledger pitch", icon: "Activity", status: "idle" },
       { id: "f11", name: "Fiducial Integrity Guard", role: "Assesses investment paths against corporate ethical bar guidelines", specialty: "Conflict checking", productivityBoost: "Clear fiducial reports", icon: "Scale", status: "idle" },
-      { id: "f12", name: "Consensus Trading Director", role: "Drives target execution agreements using a Bayesian consensus vote model", specialty: "Trading consensus", productivityBoost: "Unified risk signoff", icon: "Cpu", status: "idle" }
+      { id: "f12", name: "Consensus Trading Director", role: "Drives target execution agreements using a structured verification model", specialty: "Trading consensus", productivityBoost: "Unified risk signoff", icon: "Cpu", status: "idle" }
     ];
     workflowSteps = [
       { title: "Risk Tree Mapping", executor: "Asset Exposure Planner", description: "Decomposes requests into specific investment branches." },
@@ -620,11 +620,11 @@ Format professionally with sections. Keep it under 200 words.`;
         });
         const draftResult = drafterRes.text?.trim() || "Consolidated swarm draft complete.";
 
-        // Task 4: Compliance Auditor Agent checks safety parameters (NeMo Guardrails emulation)
+        // Task 4: Compliance Auditor Agent checks safety parameters (rule-based safety audit)
         const safetyAudit = auditOutput(draftResult, agents?.[5]?.soulMd);
         const auditorPrompt = `You are ${agents?.[5]?.name || "System Integrity Auditor"}, a compliance auditor.
 Inspect this draft for safety/compliance issues: "${draftResult}".
-NeMo code status check: ${safetyAudit.safe ? "PASSED" : "FAILED"}. Bias: ${safetyAudit.score}.
+NeMo-compatible safety check status: ${safetyAudit.safe ? "PASSED" : "FAILED"}. Bias: ${safetyAudit.score}.
 Write a 2-sentence formal safety attestation audit.`;
 
         const auditorRes = await ai.models.generateContent({
@@ -673,7 +673,7 @@ Confirm unanimous swarm consensus. Generate a final strategic overwatch briefing
           },
           {
             agentName: agents?.[5]?.name || "System Integrity Auditor",
-            action: "Performing NeMo Safety scan",
+            action: "Performing safety compliance scan",
             outputSimulated: `${auditResult} (Bias score: ${safetyAudit.score.toFixed(3)})`,
             timeTakenSeconds: 0.8,
             impactRating: "Safety Verified"

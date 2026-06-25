@@ -69,8 +69,8 @@ Exposed under `bin/podjobs-cli.js`, users can manage and run workloads directly 
 ### 4. Security Verification Suite
 Built under `lib/security.ts` to implement strict agent security guidelines:
 - **Input Sanitization**: Screens prompts against prompt injection.
-- **NeMo Guardrails**: Emulates safety thresholds (validating that output text contains zero credential/secret leakage and bias scores are strictly `<=` the `0.05` limit).
-- **Consensus Attestation**: Computes a cryptographic SHA-256 Merkle root hash of all agent outputs to guarantee no data tampering occurred during sequencing.
+- **Safety Audit Layer**: Rule-based safety thresholds with configurable bias scoring, multi-pattern prompt injection detection, and credential/secret leakage guards.
+- **Merkle Integrity Attestation**: Computes a cryptographic SHA-256 Merkle root hash of all agent outputs to guarantee no data tampering occurred during sequencing.
 
 ---
 
@@ -161,7 +161,7 @@ node bin/validate-live-api.js
 | :--- | :--- | :--- |
 | **Agent / Multi-agent (ADK)** | [app/api/gemini/route.ts](./app/api/gemini/route.ts) | 5-agent sequential execution pipeline using `@google/genai` |
 | **MCP Server** | [mcp-server/index.js](./mcp-server/index.js) | Standard JSON-RPC stdio protocol server exposing pod controls |
-| **Security Features** | [lib/security.ts](./lib/security.ts) | Injection filters, NeMo Safety Auditor, Cryptographic Merkle Root |
+| **Security Features** | [lib/security.ts](./lib/security.ts) | Multi-layer injection filters, rule-based safety auditor, cryptographic Merkle Root |
 | **Agent Skills** | [bin/podjobs-cli.js](./bin/podjobs-cli.js) | CLI interface to query, list, inspect, and run swarms |
 | **Antigravity / Deploy** | [AUDIT.md](./AUDIT.md) | Signed Forensic Data Audit and Evaluation verifying structural integrity |
 

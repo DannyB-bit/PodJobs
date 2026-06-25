@@ -475,7 +475,7 @@ Believes that "The impossible is just code waiting to be written." This node str
 ### Orchestration Topology
 - **Parent Node**: Merkle Tree Swarm Root Controller (Direct Command Line Interface)
 - **Local Gateway Registry**: OpenClaw Node Swarm Controller
-- **Consensus Scheme**: Bayesian Agreement voting matrix with 12 peer nodes
+- **Consensus Scheme**: Sequential pipeline verification with Merkle integrity attestation across 12 peer nodes
 
 ### Downstream Ingress/Egress Routers
 - **Ingress**: Listening securely on TLS Port 8083 router channel
@@ -493,7 +493,7 @@ Believes that "The impossible is just code waiting to be written." This node str
 - Retains up to 40,000 contextual tokens of direct user message streams.
 - Refers queries dynamically to the localized RAG Hub when matching terms of context are queried.`;
 
-      enriched.safetyMd = enriched.safetyMd || `# NVIDIA NeMo Safety Guardrails Constraint Schema
+      enriched.safetyMd = enriched.safetyMd || `# Safety Guardrails Constraint Schema
 ## Node Alignment Class: High-Fidelity Domain Authority
 
 ### Guardrail Directives

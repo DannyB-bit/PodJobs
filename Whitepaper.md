@@ -17,7 +17,7 @@
 ## 📖 Executive Summary
 Conventional enterprise workflows scale horizontally by adding headcount—introducing communication overhead, scheduling delays, and structural coordination errors. **Project PJ (PodJobs.ai)** proves a new paradigm of **Cognitive Amplification**: *one human specialist directing a synchronized, parallel consensus department of 12 intelligent AI agents.*
 
-By combining the **Google GenAI SDK**, **Model Context Protocol (MCP)**, **NVIDIA NeMo Guardrails emulation**, and **cryptographic Merkle Root consensus signatures**, Project PJ provides a secure, zero-overhead workflow sandbox that scales capabilities instead of headcount.
+By combining the **Google GenAI SDK**, **Model Context Protocol (MCP)**, a **rule-based safety audit layer**, and **cryptographic Merkle Root integrity attestation**, Project PJ provides a secure, zero-overhead workflow sandbox that scales capabilities instead of headcount.
 
 [QR_CODES_ROW]
 
@@ -53,8 +53,8 @@ The corporate solution is fear and layoffs. The **Project PJ** solution is remot
 | The Corporate Problem | Project PJ Solution |
 | :--- | :--- |
 | **Execution Latency**: 3-10 days for complex documents. | **Asynchronous Swarms**: Multi-agent tasks finished in under 15 seconds. |
-| **Verification Overhead**: Peer-reviews introduce delays. | **Bayesian Consensus**: Unanimous 12-node voting verification. |
-| **Security Risks**: Confidentiality leaks and input injection. | **Isolation Shield**: Prompt sanitization and NeMo Guardrail thresholds. |
+| **Verification Overhead**: Peer-reviews introduce delays. | **Sequential Pipeline Verification**: 5-node cascade with Merkle integrity attestation. |
+| **Security Risks**: Confidentiality leaks and input injection. | **Isolation Shield**: Multi-layer prompt sanitization and safety audit thresholds. |
 | **Audit Trails**: Hard to track steps in multi-agent reasoning. | **Merkle-Attestation Seals**: Immutable cryptographic signatures. |
 
 ---
@@ -69,16 +69,16 @@ graph TD
     C -->|Mines case files / documents| D[Suite Draftsman Node]
     D -->|Synthesizes professional briefs| E[System Integrity Auditor Node]
     E -->|Scans for safety & biases| F[Swarms Consensus Arbiter Node]
-    F -->|Bayesian consensus seal| G[Merkle Root Cryptographic Seal]
+    F -->|Pipeline integrity seal| G[Merkle Root Cryptographic Seal]
 ```
 
 1. **Planner Node**: Maps out execution branches and allocates agent responsibilities.
 2. **Context Miner Node**: Performs vector grounding (RAG) based on local knowledge databases.
 3. **Suite Draftsman Node**: Compiles professional documents and templates.
-4. **System Integrity Auditor Node**: Emulates **NVIDIA NeMo Guardrails**, rejecting any payload with a bias/safety score exceeding `0.05`.
+4. **System Integrity Auditor Node**: Applies a **rule-based safety audit** with configurable bias thresholds, rejecting any payload with a bias/safety score exceeding `0.05`.
 5. **Swarms Consensus Arbiter Node**: Performs final validation and returns the output along with a mathematical seal.
 
-### Cryptographic Consensus & Merkle Attestation
+### Cryptographic Integrity & Merkle Attestation
 To guarantee the logical integrity of the reasoning path, the input, actions, and outputs of all agent nodes are sequentially hashed and sealed into a **Merkle Tree**. The resulting **Merkle Root Hash** acts as an immutable tamper-proof signature, proving that no node's intermediate outputs were modified during the cascade.
 
 ---

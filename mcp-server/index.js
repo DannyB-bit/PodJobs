@@ -66,9 +66,9 @@ const presets = [
 function getAgentManifestFiles(agent, podTitle) {
   return {
     soul: `# Cognitive Soul Profile: ${agent.name}\n## Directives: ${agent.role}\n- **Specialty**: ${agent.specialty}\n- **Tone**: Ultra-professional, objective, crisp.\n- **Maxim**: The impossible is just code waiting to be written.`,
-    agents: `# Swarm inter-agent node agreement\n- **Topology**: Merkle Tree Orchestration Hub\n- **Consensus**: Bayesian consensus voting under NeMo Safety bounds.`,
+    agents: `# Swarm inter-agent node agreement\n- **Topology**: Merkle Tree Orchestration Hub\n- **Consensus**: Sequential pipeline verification with Merkle integrity attestation.`,
     memory: `# Memory Ledger\n- **LMCache status**: ACTIVE\n- **MemVid Layer status**: SYNCED`,
-    safety: `# NVIDIA NeMo Safety Guardrail Constraints\n- **Bias threshold limit**: <= 0.05 rating\n- **Content Alignment**: Strict validation bounds.`,
+    safety: `# Safety Guardrail Constraints\n- **Bias threshold limit**: <= 0.05 rating\n- **Content Alignment**: Strict validation bounds.`,
     security: `# Swarm Security Protocol\n- **Merkle consensus hash signature**: Required.\n- **Sandbox Egress constraint**: Verified.`
   };
 }
@@ -255,7 +255,7 @@ function handleToolCall(id, name, args) {
                     `- **Workflow Task**: "${prompt}"\n` +
                     `- **Execution Status**: 100% Secure Consensus Attained\n` +
                     `- **Merkle Root Proof Signature**: \`sha256:${merkleRoot}\`\n\n` +
-                    `All ${pod.agents.length} active agents successfully executed their specialized workloads and verified output integrity under NeMo Safety guidelines.`;
+                    `All ${pod.agents.length} active agents successfully executed their specialized workloads and verified output integrity under safety audit guidelines.`;
 
     sendResponse(id, {
       content: [
