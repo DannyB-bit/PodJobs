@@ -2081,7 +2081,7 @@ if __name__ == "__main__":
                     <div className="space-y-1">
                       <div className="flex justify-between text-[11px] text-slate-400">
                         <span>Validation Precision & Alignment Compliance</span>
-                        <span className="text-green-400">99.98% Bayesian Consensus</span>
+                        <span className="text-green-400">99.98% Pipeline Consensus</span>
                       </div>
                       <div className="w-full bg-[#0A0C10] rounded-full h-2 overflow-hidden border border-white/5">
                         <div className="bg-gradient-to-r from-[#34A853] to-emerald-400 h-full rounded-full" style={{ width: "99%" }} />
@@ -3293,7 +3293,7 @@ if __name__ == "__main__":
                               )}
                               {activeFramework === "nemo" && (
                                 <>
-                                  <span className="font-semibold text-slate-200 block font-sans">NVIDIA NeMo Safety Constraints Schema</span>
+                                  <span className="font-semibold text-slate-200 block font-sans">Safety Constraints Schema</span>
                                   Delineates guardrails protocols to check alignment margins, structural integrity errors, token limitations, and consensus ratios across all agent workstations.
                                 </>
                               )}

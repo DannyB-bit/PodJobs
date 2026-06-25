@@ -357,7 +357,7 @@ ${agents || "Structure: Orchestrated via OpenClaw node queues and inter-node con
 ${memory || "Context: Utilizing high-frequency MemVid frame buffers and LMCache semantic buffers."}
 
 --- SAFETY.MD ---
-${safety || "Boundary: Governed by NVIDIA NeMo Guardrails compliance threshold checks (bias rating <= 0.05)."}
+${safety || "Boundary: Governed by safety guardrails compliance threshold checks (bias rating <= 0.05)."}
 
 --- SECURITY.MD ---
 ${security || "Isolation: Signed Merkle verification proofs, zero secret leaks, isolated sandboxed executions."}
@@ -369,7 +369,7 @@ Please reply directly to the human Director's query. Adopt your exact profession
 This is ${agentName} speaking, representing my assigned nodes (${pronouns}). My custom routing gateway at 'router://openclaw/node' is active and listening.
 LMCache memory layers and MemVid video sync records have loaded securely.
 
-NVIDIA NeMo Guardrails check complete:
+Safety Guardrails check complete:
 - Bias quotient: 0.01 (optimal)
 - Compliance status: STRICTLY COMPLIANT
 - Context ground: Grounding checked against Stanford meta-harness criteria.
