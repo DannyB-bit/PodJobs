@@ -2,7 +2,8 @@
 
 ![Project PJ Logo](assets/pj_logo.jpg)
 
-**Architect & Author:** Devs One — Danny Bouldiez  
+**Architects & Authors:** zyamtica.space, astronuatshe.com, Devs One  
+**Roles:** zymatica (Lead Architect & Engineer), astronautshe (Edge Systems Engineer & Music Artist), Devs One (AI Swarm with human in the loop)  
 **Platform:** Google AI Studio, Google Antigravity, and Nous Research Hermes Agent  
 **Build Status:** Deployed & Live  
 **On-Chain Attestation Video NFT:** [Tezos Objkt Token #94](https://objkt.com/tokens/KT1L2gY2BUE2gcydLUXLzSAYwAvriYvZMBQ8/94)  
@@ -53,14 +54,14 @@ The corporate solution is fear and layoffs. The **Project PJ** solution is remot
 | The Corporate Problem | Project PJ Solution |
 | :--- | :--- |
 | **Execution Latency**: 3-10 days for complex documents. | **Asynchronous Swarms**: Multi-agent tasks finished in under 15 seconds. |
-| **Verification Overhead**: Peer-reviews introduce delays. | **Sequential Pipeline Verification**: 5-node cascade with Merkle integrity attestation. |
+| **Verification Overhead**: Peer-reviews introduce delays. | **Sequential Pipeline Verification**: 5-stage cascade with Merkle integrity attestation. |
 | **Security Risks**: Confidentiality leaks and input injection. | **Isolation Shield**: Multi-layer prompt sanitization and safety audit thresholds. |
 | **Audit Trails**: Hard to track steps in multi-agent reasoning. | **Merkle-Attestation Seals**: Immutable cryptographic signatures. |
 
 ---
 
 ## 🏗️ Architecture & Sequential Cascade (ADK)
-Project PJ implements a 5-node sequential execution cascade utilizing the **Google GenAI SDK** (`gemini-3.5-flash`):
+Project PJ implements a 5-stage sequential execution cascade utilizing the Google GenAI SDK (`gemini-3.5-flash`). While the swarm consists of a department of 12 specialized agents, they map functionally into these 5 core execution roles:
 
 ```mermaid
 graph TD
@@ -81,12 +82,25 @@ graph TD
 ### Cryptographic Integrity & Merkle Attestation
 To guarantee the logical integrity of the reasoning path, the input, actions, and outputs of all agent nodes are sequentially hashed and sealed into a **Merkle Tree**. The resulting **Merkle Root Hash** acts as an immutable tamper-proof signature, proving that no node's intermediate outputs were modified during the cascade.
 
+### 🛡️ Multi-Layer Security & Leakage Shield
+Project PJ incorporates an ironclad security enforcement suite within [lib/security.ts](file:///k:/Cpastone-Project-kaggle5day/lib/security.ts) to protect agent communications and private credentials:
+* **Prompt Injection Defense**: A two-layer scanner filtering incoming human prompts. Layer 1 detects exact substring overrides (`ignore all previous instructions`, `dev mode bypass`). Layer 2 applies regular expressions to detect obfuscated unicode, base64 payload smuggling, and role boundaries (e.g., `[INST]`, `<|system|>`).
+* **Credential & Secret Leakage Guard**: Screens agent responses in real time. It uses pattern matching to block leaks of critical credentials, including AWS keys, Google API keys (`AIzaSy...`), JWTs, and OpenAI keys (`sk-...`).
+* **Rule-Based Compliance Auditor**: Evaluates content polarity and unprofessional language, blocking any outputs with an evaluated bias score above `0.05` (`0.02` for strict profiles) before consensus can be sealed.
+
 ---
 
 ## 🔌 Local CLI & MCP Extensibility
 To enable external developer tools and shell automation, Project PJ exposes:
-* **JSON-RPC MCP Server (`mcp-server/index.js`)**: A stdio-based server compliant with the Model Context Protocol, exposing swarm simulation and inspect tools to IDEs like Claude Desktop.
-* **Command-Line Agent Skill (`bin/podjobs-cli.js`)**: A CLI enabling offline simulations and live sequential runs directly from the developer shell.
+* **JSON-RPC MCP Server (`mcp-server/index.js`)**: A stdio-based server compliant with the Model Context Protocol, exposing swarm controls to IDEs like Claude Desktop. It registers three primary tools:
+  * `list_agent_pods`: Retrieves all standard and custom workstation domains.
+  * `get_agent_manifest`: View an agent's Markdown soul files (`soul.md`, `agents.md`, `safety.md`).
+  * `run_swarm_simulation`: Dispatches prompts directly to the swarm.
+* **Command-Line Agent Skill (`bin/podjobs-cli.js`)**: A CLI enabling offline simulations and live sequential runs directly from the developer shell. Key commands include:
+  * `node bin/podjobs-cli.js list`: Lists standard and custom workstation pods.
+  * `node bin/podjobs-cli.js inspect [pod]`: View an agent pod's configuration.
+  * `node bin/podjobs-cli.js simulate "[prompt]" --pod [pod]`: Runs a local simulation.
+  * `node bin/podjobs-cli.js run "[prompt]" --pod [pod]`: Executes a live, Gemini-powered sequence cascade.
 * **Deployed API Validator (`bin/validate-live-api.js`)**: A testing harness verifying that Vercel serverless routes correctly connect with live Google APIs.
 
 ---

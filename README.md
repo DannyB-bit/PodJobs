@@ -150,7 +150,7 @@ node bin/validate-live-api.js
 
 ### What it Tests:
 1. **Dynamic Swarm Generation**: Requests a 12-agent Paralegal Pod dynamically from the server and validates the returned JSON schema structure and parameters.
-2. **Sequential Multi-Agent Cascade (ADK)**: Verifies that the 5-node sequential agent cascade executes correctly, applies NeMo safety checks, and seals the output with a cryptographic Merkle Root signature.
+2. **Sequential Multi-Agent Cascade (ADK)**: Verifies that the 12-agent swarm executes sequentially through a 5-stage cascade, applies safety checks, and seals the output with a cryptographic Merkle Root signature.
 3. **Direct Agent Handshake Chat**: Tests real-time communication with a specific agent node, checking tone compliance and pronouns.
 
 ---
@@ -159,7 +159,7 @@ node bin/validate-live-api.js
 
 | Key Concept | Implementation Location | Demo Details |
 | :--- | :--- | :--- |
-| **Agent / Multi-agent (ADK)** | [app/api/gemini/route.ts](./app/api/gemini/route.ts) | 5-agent sequential execution pipeline using `@google/genai` |
+| **Agent / Multi-agent (ADK)** | [app/api/gemini/route.ts](./app/api/gemini/route.ts) | 12-agent swarm sequential execution through 5 functional stages |
 | **MCP Server** | [mcp-server/index.js](./mcp-server/index.js) | Standard JSON-RPC stdio protocol server exposing pod controls |
 | **Security Features** | [lib/security.ts](./lib/security.ts) | Multi-layer injection filters, rule-based safety auditor, cryptographic Merkle Root |
 | **Agent Skills** | [bin/podjobs-cli.js](./bin/podjobs-cli.js) | CLI interface to query, list, inspect, and run swarms |

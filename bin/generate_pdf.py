@@ -355,7 +355,7 @@ def parse_markdown_to_flowables(filepath, styles):
         else:
             # Paragraph
             text = format_inline(stripped)
-            if "Architect &amp; Author" in text or "Platform:" in text or "Build Status:" in text:
+            if "Architect" in text or "Roles:" in text or "Platform:" in text or "Build Status:" in text:
                 flowables.append(Paragraph(text, styles['MetadataCentred']))
             elif "H U M A N" in text and "D N A" in text:
                 flowables.append(Paragraph(text, styles['HumanCaptionStyle']))
